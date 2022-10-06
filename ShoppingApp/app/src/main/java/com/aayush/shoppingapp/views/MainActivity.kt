@@ -2,7 +2,7 @@ package com.aayush.shoppingapp.views
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import fake.`package`.name.`for`.sync.R
+import com.aayush.shoppingapp.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
