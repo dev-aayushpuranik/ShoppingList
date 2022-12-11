@@ -14,4 +14,13 @@ fun Int?.orDefaut(): Int{
     return this ?: 0
 }
 
-// endregion
+// endregion Int extension
+
+
+// region String extension
+
+fun String?.orDefaut(): String{
+    return if(this != null && this.isNotEmpty()) this else ""
+}
+
+// endregion String extension
