@@ -45,7 +45,5 @@ class CategoryViewHolder(view: View, onItemClick: (Int) -> Unit):
     fun bind(model: CategoryModel) {
         itemView.findViewById<TextView>(R.id.categoryNameTV).text = model.CategoryName
         itemView.findViewById<TextView>(R.id.DiscriptionNameTV).text = model.Description
-        itemView.findViewById<TextView>(R.id.TotalItemCount).text = model.TotalItems.toString()
-        itemView.findViewById<TextView>(R.id.pendingItemCount).text = model.PendingItems.toString()
     }
 }
