@@ -16,17 +16,25 @@ class CategoriesViewModel : ViewModel() {
         MutableLiveData<List<CategoryModel>>()
     }
 
-    private var mRepo: CategoryRepository? = null
+    private var mRepo: CategoryRepository? = CategoryRepository.getInstance()
 
     public suspend fun addNewCategory(context: Context, categoryModel: CategoryModel) {
-        mRepo = CategoryRepository.getInstance()
-
         mRepo?.addNewCategory(context, categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
 
+    public suspend fun deleteCategoryItemFromDB(context: Context, categoryModel: CategoryModel) {
+        mRepo?.deleteCategoryItemFromDB(context, categoryModel, onSuccess = {
+            getCategoriesFromDB(context)
+        }, onError = {
+            getCategoriesFromDB(context)
+        })
+    }
+
     public fun getCategoriesFromDB(context: Context) {
+        mRepo = CategoryRepository.getInstance()
+
         mRepo?.getCategories(context) {
             CoroutineScope(Dispatchers.Main).launch {
                 categories.value = getCategories(it)

@@ -49,7 +49,20 @@ class CategoryRepository {
         }
     }
 
+    public suspend fun deleteCategoryItemFromDB(context: Context,
+                                                categoryModel: CategoryModel,
+                                                onSuccess: () -> Unit,
+                                                onError: () -> Unit) {
+        try {
+            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao()}
+            categoryDatabase.delete(getCategoryTable(categoryModel))
+            onSuccess()
+        }catch (ex:Exception) {
+            onError()
+        }
+    }
+
     private fun getCategoryTable(categoryModel: CategoryModel) : CategoryTable {
-       return CategoryTable(categoryModel.CategoryId,categoryModel.CategoryName,categoryModel.Description)
+        return CategoryTable(categoryModel.CategoryId,categoryModel.CategoryName,categoryModel.Description)
     }
 }
