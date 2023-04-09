@@ -2,6 +2,12 @@ package com.aayush.shoppingapp.common.extensions
 
 import java.util.*
 
+// region List extension
+fun <T>List<T>?.orDefault() : List<T> {
+    return this ?: listOf<T>()
+}
+// endregion
+
 // region ArrayList extensions
 fun <T>ArrayList<T>?.orDefault() : ArrayList<T> {
     return this ?: arrayListOf<T>()
