@@ -32,7 +32,7 @@ class CategoryRepository {
         }
     }
 
-    public suspend fun addNewCategory(
+    suspend fun addNewCategory(
         context: Context,
         categoryModel: CategoryModel,
         onSuccess: () -> Unit,
@@ -49,7 +49,24 @@ class CategoryRepository {
         }
     }
 
-    public suspend fun deleteCategoryItemFromDB(context: Context,
+    suspend fun updateCategoryList(
+        context: Context,
+        categoryList: List<CategoryModel>,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
+        try {
+            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
+
+            categoryDatabase.insertAll(getAllCategories(categoryList))
+
+            onSuccess.invoke()
+        } catch (ex: java.lang.Exception) {
+            onError.invoke()
+        }
+    }
+
+    suspend fun deleteCategoryItemFromDB(context: Context,
                                                 categoryModel: CategoryModel,
                                                 onSuccess: () -> Unit,
                                                 onError: () -> Unit) {
@@ -60,6 +77,14 @@ class CategoryRepository {
         }catch (ex:Exception) {
             onError()
         }
+    }
+
+    private fun getAllCategories(categories: List<CategoryModel>) : List<CategoryTable> {
+        val list = arrayListOf<CategoryTable>()
+        for (category in categories) {
+            list.add(getCategoryTable(category))
+        }
+        return list.toList()
     }
 
     private fun getCategoryTable(categoryModel: CategoryModel) : CategoryTable {

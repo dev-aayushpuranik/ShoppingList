@@ -18,13 +18,19 @@ class CategoriesViewModel : ViewModel() {
 
     private var mRepo: CategoryRepository? = CategoryRepository.getInstance()
 
-    public suspend fun addNewCategory(context: Context, categoryModel: CategoryModel) {
+    suspend fun addNewCategory(context: Context, categoryModel: CategoryModel) {
         mRepo?.addNewCategory(context, categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
 
-    public suspend fun deleteCategoryItemFromDB(context: Context, categoryModel: CategoryModel) {
+    suspend fun updateCategoryList(context: Context, categories: List<CategoryModel>) {
+        mRepo?.updateCategoryList(context, categories, onSuccess = {
+            getCategoriesFromDB(context)
+        }, onError = {})
+    }
+
+    suspend fun deleteCategoryItemFromDB(context: Context, categoryModel: CategoryModel) {
         mRepo?.deleteCategoryItemFromDB(context, categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {
@@ -32,7 +38,7 @@ class CategoriesViewModel : ViewModel() {
         })
     }
 
-    public fun getCategoriesFromDB(context: Context) {
+    fun getCategoriesFromDB(context: Context) {
         mRepo = CategoryRepository.getInstance()
 
         mRepo?.getCategories(context) {

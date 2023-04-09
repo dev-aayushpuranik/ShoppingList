@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.models.CategoryModel
 
 class CategoryAdapter(
@@ -45,5 +46,7 @@ class CategoryViewHolder(view: View, onItemClick: (Int) -> Unit):
     fun bind(model: CategoryModel) {
         itemView.findViewById<TextView>(R.id.categoryNameTV).text = model.CategoryName
         itemView.findViewById<TextView>(R.id.DiscriptionNameTV).text = model.Description
+
+        itemView.findViewById<TextView>(R.id.DiscriptionNameTV).SetViewVisible(model.Description.isNotEmpty())
     }
 }

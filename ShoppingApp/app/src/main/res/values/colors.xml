@@ -8,5 +8,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="recyclerViewBG">#F6F6F6</color>
-    <color name="swipe_background_color">#AA4A44</color>
+    <color name="swipe_background_color">#F44336</color>
 </resources>

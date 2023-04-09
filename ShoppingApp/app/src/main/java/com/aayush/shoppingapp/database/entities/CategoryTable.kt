@@ -5,7 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class CategoryTable(
-    @PrimaryKey val id: Long,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long,
     val CategoryTitle: String,
     val CategoryDescription: String
 )

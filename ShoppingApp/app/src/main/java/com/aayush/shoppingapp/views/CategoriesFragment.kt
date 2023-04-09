@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.common.extensions.orDefaut
 import com.aayush.shoppingapp.common.helpers.SwipeHelper
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.viewModels.CategoriesViewModel
@@ -28,8 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
-import kotlin.collections.ArrayList
-
 
 class CategoriesFragment : Fragment() {
 
@@ -37,11 +36,11 @@ class CategoriesFragment : Fragment() {
     private lateinit var categoryViewModel: CategoriesViewModel
     private var progressBar: ProgressBar? = null
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var BottomSheetView: ConstraintLayout
-    private lateinit var BottomSheetHeader: TextView
-    private lateinit var BottomSheetCategoryName: TextView
-    private lateinit var BottomSheetDiscription: TextView
-    private lateinit var BottomSheetSaveButton: Button
+    private lateinit var bottomSheetView: ConstraintLayout
+    private lateinit var bottomSheetHeader: TextView
+    private lateinit var bottomSheetCategoryName: TextView
+    private lateinit var bottomSheetDescription: TextView
+    private lateinit var bottomSheetSaveButton: Button
     private lateinit var recyclerView: RecyclerView
     private lateinit var mAdapter: CategoryAdapter
 
@@ -52,7 +51,7 @@ class CategoriesFragment : Fragment() {
         rootView = inflater.inflate(R.layout.fragment_categories, container, false)
 
         categoryViewModel =
-            ViewModelProvider(requireActivity()).get(CategoriesViewModel::class.java)
+            ViewModelProvider(requireActivity())[CategoriesViewModel::class.java]
 
         setView()
         setAddCategoryView()
@@ -61,30 +60,27 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setView() {
-        BottomSheetView = rootView.findViewById<ConstraintLayout>(R.id.add_category_view)
-        BottomSheetHeader = rootView.findViewById(R.id.addCategoryTitle)
-        BottomSheetCategoryName = BottomSheetView.findViewById(R.id.categoryNameTV)
-        BottomSheetDiscription = BottomSheetView.findViewById(R.id.categoryDescriptionTv)
-        BottomSheetSaveButton = BottomSheetView.findViewById<AppCompatButton>(R.id.saveTaskBtn)
+        bottomSheetView = rootView.findViewById(R.id.add_category_view)
+        bottomSheetHeader = rootView.findViewById(R.id.addCategoryTitle)
+        bottomSheetCategoryName = bottomSheetView.findViewById(R.id.categoryNameTV)
+        bottomSheetDescription = bottomSheetView.findViewById(R.id.categoryDescriptionTv)
+        bottomSheetSaveButton = bottomSheetView.findViewById<AppCompatButton>(R.id.saveTaskBtn)
 
 
         recyclerView = rootView.findViewById(R.id.categoriesRV)
-        mAdapter = CategoryAdapter {
-            navigateToSubTaskList()
-        }
+        mAdapter = CategoryAdapter { navigateToSubTaskList() }
         recyclerView.adapter = mAdapter
-        recyclerView.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         val sh = SwipeHelper(
             requireContext(),
-            onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, i: Int ->
-                val item: CategoryModel = mAdapter.data.get(viewHolder.adapterPosition)
+            onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
+                val item: CategoryModel = mAdapter.data[viewHolder.adapterPosition]
                 deleteCategoryItemFromDB(item)
                 Snackbar.make(recyclerView, "Deleted " + item.CategoryName, Snackbar.LENGTH_LONG)
                     .setAction("Undo") {
                         addCategoryItemToDB(item)
-                        mAdapter.notifyDataSetChanged()
+                        mAdapter.notifyItemRangeChanged(0, categoryViewModel.categories.value?.size.orDefaut())
                     }.show()
             })
 
@@ -108,21 +104,21 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setAddCategoryView() {
-        bottomSheetBehavior = BottomSheetBehavior.from(BottomSheetView)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
         setBottomSheetStateCollapse()
 
-        BottomSheetSaveButton.setOnClickListener {
-            if (BottomSheetCategoryName.text.toString().trim().length > 0) {
+        bottomSheetSaveButton.setOnClickListener {
+            if (bottomSheetCategoryName.text.toString().trim().isNotEmpty()) {
                 setBottomSheetStateCollapse()
-                BottomSheetCategoryName.clearFocus()
-                BottomSheetDiscription.clearFocus()
+                bottomSheetCategoryName.clearFocus()
+                bottomSheetDescription.clearFocus()
 
                 addCategoryDataToDB()
 
-                BottomSheetCategoryName.text = null
-                BottomSheetDiscription.text = null
+                bottomSheetCategoryName.text = null
+                bottomSheetDescription.text = null
             } else {
-                Toast.makeText(requireContext(), "Tite cannot be empty", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "Category Name field cannot be empty", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -135,15 +131,15 @@ class CategoriesFragment : Fragment() {
                 var title = getString(R.string.add_new_list)
                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
                     title += "(+)"
-                    BottomSheetHeader.setText(title)
+                    bottomSheetHeader.text = title
                 } else if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                     title += "(-)"
-                    BottomSheetHeader.setText(title)
+                    bottomSheetHeader.text = title
                 }
             }
         })
 
-        BottomSheetHeader.setOnClickListener {
+        bottomSheetHeader.setOnClickListener {
             setBottomSheetStateCollapseOrExpand()
         }
     }
@@ -151,8 +147,8 @@ class CategoriesFragment : Fragment() {
     private fun addCategoryDataToDB() {
         val categoryModel = CategoryModel(
             Date().time,
-            BottomSheetCategoryName.text.toString().trim(),
-            BottomSheetDiscription.text.toString().trim()
+            bottomSheetCategoryName.text.toString().trim(),
+            bottomSheetDescription.text.toString().trim()
         )
         addCategoryItemToDB(categoryModel)
     }
@@ -160,6 +156,12 @@ class CategoriesFragment : Fragment() {
     private fun addCategoryItemToDB(categoryModel: CategoryModel) {
         CoroutineScope(Dispatchers.IO).launch {
             categoryViewModel.addNewCategory(requireContext(), categoryModel)
+        }
+    }
+
+    private fun updateCategoryList(categories: List<CategoryModel>) {
+        CoroutineScope(Dispatchers.IO).launch {
+            categoryViewModel.updateCategoryList(requireContext(), categories)
         }
     }
 
@@ -190,6 +192,15 @@ class CategoriesFragment : Fragment() {
             .replace(R.id.container, SubtaskListFragment.newInstance(""))
             .addToBackStack("SubtaskListFragmentStack")
             .commit()
+    }
+
+    private fun getDemoCategories(): List<CategoryModel> {
+        val list = arrayListOf<CategoryModel>()
+        list.add(CategoryModel(1L, "Shopping List", "Just normal shopping list"))
+        list.add(CategoryModel(2L, "Dmart List",""))
+        list.add(CategoryModel(3L, "List2",""))
+
+        return list.toList()
     }
 }
 

@@ -17,12 +17,12 @@ class SwipeHelper(
 
 
     var mContext: Context? = null
-    private val deleteIcon = ContextCompat.getDrawable(context, android.R.drawable.ic_menu_delete)
+    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_delete_24)
     private var intrinsicWidth = deleteIcon?.intrinsicWidth
     private var intrinsicHeight = deleteIcon?.intrinsicHeight
     private var background = ColorDrawable()
     private var mClearPaint: Paint? = null
-    private var backgroundColor = Color.parseColor("#f44336")
+    private var backgroundColor = ContextCompat.getColor(context, R.color.swipe_background_color)
     private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
     init {
@@ -30,7 +30,7 @@ class SwipeHelper(
         background = ColorDrawable()
         backgroundColor = ContextCompat.getColor(context, R.color.swipe_background_color)
         mClearPaint = Paint()
-        mClearPaint?.setXfermode(PorterDuffXfermode(PorterDuff.Mode.CLEAR))
+        mClearPaint?.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
         intrinsicWidth = deleteIcon?.intrinsicWidth
         intrinsicHeight = deleteIcon?.intrinsicHeight
     }
