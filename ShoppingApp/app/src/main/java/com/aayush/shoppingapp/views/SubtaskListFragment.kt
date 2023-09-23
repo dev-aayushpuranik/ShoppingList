@@ -94,12 +94,9 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
 
         pendingRecyclerView = rootView.findViewById(R.id.subtaskRV)
         pendingTaskAdapter = SubCategoryAdapter(requireContext(), {
-            val status = if(it.isTaskDone) "Completed" else "Pending"
-            Toast.makeText(requireContext(), it.subtaskName +" is "+status, Toast.LENGTH_SHORT).show()
+
         }, {
             subCategoryViewModel.updateCategoryItem(requireContext(), it)
-            val status = if(it.isTaskDone) "Completed" else "Pending"
-            Toast.makeText(requireContext(), it.subtaskName +" is "+status, Toast.LENGTH_SHORT).show()
         })
         pendingRecyclerView.adapter = pendingTaskAdapter
         pendingRecyclerView.layoutManager =
@@ -121,12 +118,9 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
 
         completedRecyclerView = rootView.findViewById(R.id.completedSubtaskRV)
         completedTaskAdapter = SubCategoryAdapter(requireContext(), {
-            val status = if(it.isTaskDone) "Completed" else "Pending"
-            Toast.makeText(requireContext(), it.subtaskName +" is "+status, Toast.LENGTH_SHORT).show()
+
         }, {
             subCategoryViewModel.updateCategoryItem(requireContext(), it)
-            val status = if(it.isTaskDone) "Completed" else "Pending"
-            Toast.makeText(requireContext(), it.subtaskName +" is "+status, Toast.LENGTH_SHORT).show()
         })
         completedRecyclerView.adapter = completedTaskAdapter
         completedRecyclerView.layoutManager =
