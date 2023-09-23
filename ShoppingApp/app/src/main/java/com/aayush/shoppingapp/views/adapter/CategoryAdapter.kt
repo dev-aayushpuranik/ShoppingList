@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
+import com.aayush.shoppingapp.common.extensions.orDefaut
 import com.aayush.shoppingapp.models.CategoryModel
 
 class CategoryAdapter(
@@ -31,7 +32,7 @@ class CategoryAdapter(
     }
 
     override fun getItemCount(): Int {
-        return data.size
+        return data.size.orDefaut()
     }
 }
 

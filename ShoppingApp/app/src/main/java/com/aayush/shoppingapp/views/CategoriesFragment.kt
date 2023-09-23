@@ -66,9 +66,8 @@ class CategoriesFragment : Fragment() {
         bottomSheetDescription = bottomSheetView.findViewById(R.id.categoryDescriptionTv)
         bottomSheetSaveButton = bottomSheetView.findViewById<AppCompatButton>(R.id.saveTaskBtn)
 
-
         recyclerView = rootView.findViewById(R.id.categoriesRV)
-        mAdapter = CategoryAdapter { navigateToSubTaskList() }
+        mAdapter = CategoryAdapter { navigateToSubTaskList(it.CategoryId) }
         recyclerView.adapter = mAdapter
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
@@ -187,20 +186,11 @@ class CategoriesFragment : Fragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    private fun navigateToSubTaskList() {
+    private fun navigateToSubTaskList(categoryId: Long) {
         parentFragmentManager.beginTransaction()
-            .replace(R.id.container, SubtaskListFragment.newInstance(""))
+            .replace(R.id.container, SubtaskListFragment(categoryId))
             .addToBackStack("SubtaskListFragmentStack")
             .commit()
-    }
-
-    private fun getDemoCategories(): List<CategoryModel> {
-        val list = arrayListOf<CategoryModel>()
-        list.add(CategoryModel(1L, "Shopping List", "Just normal shopping list"))
-        list.add(CategoryModel(2L, "Dmart List",""))
-        list.add(CategoryModel(3L, "List2",""))
-
-        return list.toList()
     }
 }
 

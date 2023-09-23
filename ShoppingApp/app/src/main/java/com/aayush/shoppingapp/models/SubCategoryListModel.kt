@@ -1,10 +1,10 @@
 package com.aayush.shoppingapp.models
 
-data class SubtaskListModel(
-    val categoryId: String,
-    val subtaskItemId: String,
+data class SubCategoryListModel(
+    val subtaskItemId: Long,
+    val categoryId: Long,
     val subtaskName: String,
     val subtaskDescription: String,
-    val isTaskDone: Boolean,
+    var isTaskDone: Boolean,
     val isImportant: Boolean
 )

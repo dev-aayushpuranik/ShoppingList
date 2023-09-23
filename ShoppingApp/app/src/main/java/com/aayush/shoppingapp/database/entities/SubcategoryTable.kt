@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 @Entity
 data class SubcategoryTable(
     @PrimaryKey(autoGenerate = true)
-    val subCategoryId: Long,
-    val subCategoryTitle: String,
+    val subtaskItemId: Long,
+    val categoryId: Long,
+    val subCategoryName: String,
     val subCategoryDescription: String,
-    val subCategoryTotalItems: Int,
-    val subCategoryPendingItems: Int,
-    val categoryId: String,
+    val isTaskDone: Boolean,
+    val isImportant: Boolean
 )

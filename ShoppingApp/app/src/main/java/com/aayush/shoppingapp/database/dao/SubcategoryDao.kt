@@ -14,9 +14,9 @@ interface SubcategoryDao {
     @Delete
     fun delete(subcategoryTable: SubcategoryTable)
 
-    @Query("SELECT * FROM SubcategoryTable")
-    fun getAll(): List<SubcategoryTable>?
+    @Query("SELECT * FROM SubcategoryTable where categoryId=:catId")
+    fun getAll(catId: Long): List<SubcategoryTable>?
 
-    @Update
-    fun updateCategory(subcategoryTable: SubcategoryTable)
+    @Update(onConflict = OnConflictStrategy.REPLACE)
+    fun updateTaskDoneForSubCategory(subcategoryTable: SubcategoryTable)
 }

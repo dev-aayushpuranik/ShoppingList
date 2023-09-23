@@ -1,7 +1,6 @@
 package com.aayush.shoppingapp.Repository
 
 import android.content.Context
-import androidx.lifecycle.MutableLiveData
 import com.aayush.shoppingapp.database.CategoryDatabase
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
@@ -40,11 +39,9 @@ class CategoryRepository {
     ) {
         try {
             val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
-
             categoryDatabase.insert(getCategoryTable(categoryModel))
-
             onSuccess.invoke()
-        } catch (ex: java.lang.Exception) {
+        } catch (ex: Exception) {
             onError.invoke()
         }
     }
@@ -57,9 +54,7 @@ class CategoryRepository {
     ) {
         try {
             val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
-
             categoryDatabase.insertAll(getAllCategories(categoryList))
-
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
