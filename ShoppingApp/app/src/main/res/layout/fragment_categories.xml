@@ -47,5 +47,7 @@
             tools:ignore="ImageContrastCheck" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/add_category_bottom_sheet" />
+    <include
+        android:id="@+id/bottomSheetLayout"
+        layout="@layout/add_category_bottom_sheet" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

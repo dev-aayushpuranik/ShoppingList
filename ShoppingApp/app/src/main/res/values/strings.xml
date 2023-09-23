@@ -9,4 +9,7 @@
     <string name="item_name">Item Name</string>
     <string name="task_completed">Task Completed</string>
     <string name="completed_tasks">Completed Tasks</string>
+    <string name="are_you_sure_you_want_to_exit">Are you sure you want to exit ?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

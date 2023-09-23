@@ -4,11 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -18,37 +13,30 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.orDefaut
+import com.aayush.shoppingapp.common.helper.UIHelper
 import com.aayush.shoppingapp.common.helpers.SwipeHelper
+import com.aayush.shoppingapp.databinding.FragmentCategoriesBinding
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.viewModels.CategoriesViewModel
 import com.aayush.shoppingapp.views.adapter.CategoryAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Date
 
 class CategoriesFragment : Fragment() {
 
-    private lateinit var rootView: View
+    private lateinit var binding: FragmentCategoriesBinding
     private lateinit var categoryViewModel: CategoriesViewModel
-    private var progressBar: ProgressBar? = null
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var bottomSheetView: ConstraintLayout
-    private lateinit var bottomSheetHeader: TextView
-    private lateinit var bottomSheetCategoryName: TextView
-    private lateinit var bottomSheetDescription: TextView
-    private lateinit var bottomSheetSaveButton: Button
-    private lateinit var recyclerView: RecyclerView
     private lateinit var mAdapter: CategoryAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        rootView = inflater.inflate(R.layout.fragment_categories, container, false)
+        binding = FragmentCategoriesBinding.inflate(inflater, container, false)
 
         categoryViewModel =
             ViewModelProvider(requireActivity())[CategoriesViewModel::class.java]
@@ -56,46 +44,38 @@ class CategoriesFragment : Fragment() {
         setView()
         setAddCategoryView()
 
-        return rootView
+        return binding.root
     }
 
     private fun setView() {
-        bottomSheetView = rootView.findViewById(R.id.add_category_view)
-        bottomSheetHeader = rootView.findViewById(R.id.addCategoryTitle)
-        bottomSheetCategoryName = bottomSheetView.findViewById(R.id.categoryNameTV)
-        bottomSheetDescription = bottomSheetView.findViewById(R.id.categoryDescriptionTv)
-        bottomSheetSaveButton = bottomSheetView.findViewById<AppCompatButton>(R.id.saveTaskBtn)
-
-        recyclerView = rootView.findViewById(R.id.categoriesRV)
         mAdapter = CategoryAdapter { navigateToSubTaskList(it.CategoryId) }
-        recyclerView.adapter = mAdapter
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.categoriesRV.adapter = mAdapter
+        binding.categoriesRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         val sh = SwipeHelper(
             requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 val item: CategoryModel = mAdapter.data[viewHolder.adapterPosition]
                 deleteCategoryItemFromDB(item)
-                Snackbar.make(recyclerView, "Deleted " + item.CategoryName, Snackbar.LENGTH_LONG)
-                    .setAction("Undo") {
-                        addCategoryItemToDB(item)
-                        mAdapter.notifyItemRangeChanged(0, categoryViewModel.categories.value?.size.orDefaut())
-                    }.show()
+
+                UIHelper.snackbar(binding.categoriesRV, "Deleted " + item.CategoryName, "Undo") {
+                    addCategoryItemToDB(item)
+                    mAdapter.notifyItemRangeChanged(0, categoryViewModel.categories.value?.size.orDefaut())
+                }
             })
 
         val itemTouchHelper = ItemTouchHelper(sh)
-        itemTouchHelper.attachToRecyclerView(recyclerView)
+        itemTouchHelper.attachToRecyclerView(binding.categoriesRV)
 
-        rootView.findViewById<FloatingActionButton>(R.id.addCategoryFAB).setOnClickListener {
+        binding.addCategoryFAB.setOnClickListener {
             setBottomSheetStateExpand()
         }
 
-        progressBar = rootView.findViewById(R.id.progressbar)
-        progressBar?.visibility = View.VISIBLE
+        binding.progressbar.visibility = View.VISIBLE
         categoryViewModel.getCategoriesFromDB(requireContext())
         val categoryDataObserver = Observer<List<CategoryModel>> {
             CoroutineScope(Dispatchers.Main).launch {
-                progressBar?.visibility = View.GONE
+                binding.progressbar.visibility = View.GONE
                 mAdapter.data = it
             }
         }
@@ -103,21 +83,21 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setAddCategoryView() {
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout.addCategoryView)
         setBottomSheetStateCollapse()
 
-        bottomSheetSaveButton.setOnClickListener {
-            if (bottomSheetCategoryName.text.toString().trim().isNotEmpty()) {
+        binding.bottomSheetLayout.saveTaskBtn.setOnClickListener {
+            if (binding.bottomSheetLayout.categoryNameTV.text.toString().trim().isNotEmpty()) {
                 setBottomSheetStateCollapse()
-                bottomSheetCategoryName.clearFocus()
-                bottomSheetDescription.clearFocus()
+                binding.bottomSheetLayout.categoryNameTV.clearFocus()
+                binding.bottomSheetLayout.categoryDescriptionTv.clearFocus()
 
                 addCategoryDataToDB()
 
-                bottomSheetCategoryName.text = null
-                bottomSheetDescription.text = null
+                binding.bottomSheetLayout.categoryNameTV.text = null
+                binding.bottomSheetLayout.categoryDescriptionTv.text = null
             } else {
-                Toast.makeText(requireContext(), "Category Name field cannot be empty", Toast.LENGTH_SHORT).show()
+                UIHelper.toast(requireContext(), "Category Name field cannot be empty")
             }
         }
 
@@ -129,16 +109,16 @@ class CategoriesFragment : Fragment() {
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 var title = getString(R.string.add_new_list)
                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                    title += "(+)"
-                    bottomSheetHeader.text = title
+                    title += ""
+                    binding.bottomSheetLayout.addCategoryTitle.text = title
                 } else if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                    title += "(-)"
-                    bottomSheetHeader.text = title
+                    title += "(+)"
+                    binding.bottomSheetLayout.addCategoryTitle.text = title
                 }
             }
         })
 
-        bottomSheetHeader.setOnClickListener {
+        binding.bottomSheetLayout.addCategoryTitle.setOnClickListener {
             setBottomSheetStateCollapseOrExpand()
         }
     }
@@ -146,8 +126,8 @@ class CategoriesFragment : Fragment() {
     private fun addCategoryDataToDB() {
         val categoryModel = CategoryModel(
             Date().time,
-            bottomSheetCategoryName.text.toString().trim(),
-            bottomSheetDescription.text.toString().trim()
+            binding.bottomSheetLayout.categoryNameTV.text.toString().trim(),
+            binding.bottomSheetLayout.categoryDescriptionTv.text.toString().trim()
         )
         addCategoryItemToDB(categoryModel)
     }
