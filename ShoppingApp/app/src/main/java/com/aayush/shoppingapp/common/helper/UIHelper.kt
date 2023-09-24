@@ -12,7 +12,7 @@ class UIHelper {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }
 
-        fun snackbar(view: View, message: String, actionText: String, onAction:() -> Unit) {
+        fun snackBar(view: View, message: String, actionText: String, onAction:() -> Unit) {
             Snackbar.make(view, message, Snackbar.LENGTH_LONG)
                 .setAction(actionText) {
                     onAction.invoke()

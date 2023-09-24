@@ -12,4 +12,5 @@
     <string name="are_you_sure_you_want_to_exit">Are you sure you want to exit ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="arrowicon">arrowIcon</string>
 </resources>

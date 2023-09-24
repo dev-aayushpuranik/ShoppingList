@@ -58,7 +58,7 @@ class CategoriesFragment : Fragment() {
                 val item: CategoryModel = mAdapter.data[viewHolder.adapterPosition]
                 deleteCategoryItemFromDB(item)
 
-                UIHelper.snackbar(binding.categoriesRV, "Deleted " + item.CategoryName, "Undo") {
+                UIHelper.snackBar(binding.categoriesRV, "Deleted " + item.CategoryName, "Undo") {
                     addCategoryItemToDB(item)
                     mAdapter.notifyItemRangeChanged(0, categoryViewModel.categories.value?.size.orDefaut())
                 }

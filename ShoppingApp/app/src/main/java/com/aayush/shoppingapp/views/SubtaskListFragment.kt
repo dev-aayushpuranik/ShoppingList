@@ -4,66 +4,45 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageView
-import android.widget.ProgressBar
-import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.widget.AppCompatButton
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.orDefaut
+import com.aayush.shoppingapp.common.helper.UIHelper
 import com.aayush.shoppingapp.common.helpers.SwipeHelper
+import com.aayush.shoppingapp.databinding.FragmentSubtaskListBinding
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import com.aayush.shoppingapp.viewModels.SubCategoryViewModel
 import com.aayush.shoppingapp.views.adapter.SubCategoryAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-/**
- * A simple [Fragment] subclass.
- * Use the [SubtaskListFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
     private lateinit var subCategoryViewModel: SubCategoryViewModel
 
-    private lateinit var rootView: View
-    private var progressBar: ProgressBar? = null
+    private lateinit var binding: FragmentSubtaskListBinding
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
-    private lateinit var bottomSheetView: ConstraintLayout
-    private lateinit var bottomSheetHeader: TextView
-    private lateinit var bottomSheetSubCategoryName: TextView
-    private lateinit var bottomSheetSubCategoryDescription: TextView
-    private lateinit var completedListHeaderView: ConstraintLayout
-    private lateinit var arrowIcon: ImageView
-    private lateinit var completedHeaderTextView: TextView
-    private lateinit var bottomSheetSaveButton: Button
-    private lateinit var pendingRecyclerView: RecyclerView
-    private lateinit var completedRecyclerView: RecyclerView
+
     private lateinit var pendingTaskAdapter: SubCategoryAdapter
     private lateinit var completedTaskAdapter: SubCategoryAdapter
 
-    private var mIsHeaderCollapsed:Boolean = true
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
-        rootView = inflater.inflate(R.layout.fragment_subtask_list, container, false)
+        binding = FragmentSubtaskListBinding.inflate(inflater, container, false)
         subCategoryViewModel =
             ViewModelProvider(requireActivity())[SubCategoryViewModel::class.java]
 
@@ -71,7 +50,7 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
         setView()
         setAddSubCategoryView()
 
-        return rootView
+        return binding.root
     }
 
     private fun loadData() {
@@ -80,32 +59,19 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
     }
 
     private fun setView() {
-        bottomSheetView = rootView.findViewById(R.id.add_Subcategory_view)
-        bottomSheetHeader = rootView.findViewById(R.id.addSubCategoryTitle)
-        bottomSheetSubCategoryName = bottomSheetView.findViewById(R.id.subCategoryNameTV)
-        bottomSheetSubCategoryDescription =
-            bottomSheetView.findViewById(R.id.subCategoryDescriptionTv)
-        bottomSheetSaveButton =
-            bottomSheetView.findViewById<AppCompatButton>(R.id.saveSubCategoryItemBtn)
-
-        arrowIcon = rootView.findViewById(R.id.arrow_icon)
-        completedListHeaderView = rootView.findViewById(R.id.constraintLayout)
-        completedHeaderTextView = rootView.findViewById(R.id.completedListHeader)
-
-        pendingRecyclerView = rootView.findViewById(R.id.subtaskRV)
         pendingTaskAdapter = SubCategoryAdapter(requireContext(), {
 
         }, {
             subCategoryViewModel.updateCategoryItem(requireContext(), it)
         })
-        pendingRecyclerView.adapter = pendingTaskAdapter
-        pendingRecyclerView.layoutManager =
+        binding.subtaskRV.adapter = pendingTaskAdapter
+        binding.subtaskRV.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         val sh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 val item: SubCategoryListModel = pendingTaskAdapter.data[viewHolder.adapterPosition]
                 deleteSubCategoryItemFromDB(item)
-                Snackbar.make(pendingRecyclerView, "Deleted " + item.subtaskName, Snackbar.LENGTH_LONG)
+                Snackbar.make(binding.subtaskRV, "Deleted " + item.subtaskName, Snackbar.LENGTH_LONG)
                     .setAction("Undo") {
                         addSubCategoryItemToDB(item)
                         pendingTaskAdapter.notifyItemRangeChanged(0,
@@ -114,43 +80,42 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
             })
 
         val pendingItemTouchHelper = ItemTouchHelper(sh)
-        pendingItemTouchHelper.attachToRecyclerView(pendingRecyclerView)
+        pendingItemTouchHelper.attachToRecyclerView(binding.subtaskRV)
 
-        completedRecyclerView = rootView.findViewById(R.id.completedSubtaskRV)
+
         completedTaskAdapter = SubCategoryAdapter(requireContext(), {
 
         }, {
             subCategoryViewModel.updateCategoryItem(requireContext(), it)
         })
-        completedRecyclerView.adapter = completedTaskAdapter
-        completedRecyclerView.layoutManager =
+        binding.completedSubtaskRV.adapter = completedTaskAdapter
+        binding.completedSubtaskRV.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         val completedSh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 val item: SubCategoryListModel = completedTaskAdapter.data[viewHolder.adapterPosition]
                 deleteSubCategoryItemFromDB(item)
-                Snackbar.make(completedRecyclerView, "Deleted " + item.subtaskName, Snackbar.LENGTH_LONG)
-                    .setAction("Undo") {
-                        addSubCategoryItemToDB(item)
-                        completedTaskAdapter.notifyItemRangeChanged(0,
-                            subCategoryViewModel.subCategories.value?.size.orDefaut())
-                    }.show()
+
+                UIHelper.snackBar(binding.completedSubtaskRV, "Deleted " + item.subtaskName, "Undo") {
+                    addSubCategoryItemToDB(item)
+                    completedTaskAdapter.notifyItemRangeChanged(0,
+                        subCategoryViewModel.subCategories.value?.size.orDefaut())
+                }
             })
 
         val completedITH = ItemTouchHelper(completedSh)
-        completedITH.attachToRecyclerView(completedRecyclerView)
+        completedITH.attachToRecyclerView(binding.completedSubtaskRV)
 
-        rootView.findViewById<FloatingActionButton>(R.id.addSubTaskFAB).setOnClickListener {
+        binding.addSubTaskFAB.setOnClickListener {
             setBottomSheetStateExpand()
         }
 
-        progressBar = rootView.findViewById(R.id.progressbar)
-        progressBar?.SetViewVisible(true)
+        binding.progressbar.SetViewVisible(true)
         subCategoryViewModel.getSubCategoriesFromDB(requireContext())
         val categoryDataObserver = Observer<List<SubCategoryListModel>> {
             CoroutineScope(Dispatchers.Main).launch {
-                progressBar?.SetViewVisible(false)
+                binding.progressbar.SetViewVisible(false)
                 if(pendingTaskAdapter.data.isEmpty() && completedTaskAdapter.data.isEmpty()) { setBottomSheetStateExpand() } else setBottomSheetStateCollapse()
                 val completedItems = arrayListOf<SubCategoryListModel>()
                 val pendingItems = arrayListOf<SubCategoryListModel>()
@@ -162,8 +127,8 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
                         pendingItems.add(item)
                     }
                 }
-                completedRecyclerView.SetViewVisible(completedItems.count() > 0)
-                completedListHeaderView.SetViewVisible(completedItems.count() > 0)
+                binding.completedSubtaskRV.SetViewVisible(completedItems.isNotEmpty())
+                binding.constraintLayout.SetViewVisible(completedItems.isNotEmpty())
                 completedTaskAdapter.data = completedItems
                 pendingTaskAdapter.data = pendingItems
             }
@@ -172,19 +137,19 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
     }
 
     private fun setAddSubCategoryView() {
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheetView)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout.addSubcategoryView)
         setBottomSheetStateCollapse()
 
-        bottomSheetSaveButton.setOnClickListener {
-            if (bottomSheetSubCategoryName.text.toString().trim().isNotEmpty()) {
+        binding.bottomSheetLayout.saveSubCategoryItemBtn.setOnClickListener {
+            if (binding.bottomSheetLayout.subCategoryNameTV.text.toString().trim().isNotEmpty()) {
                 setBottomSheetStateCollapse()
-                bottomSheetSubCategoryName.clearFocus()
-                bottomSheetSubCategoryDescription.clearFocus()
+                binding.bottomSheetLayout.subCategoryNameTV.clearFocus()
+                binding.bottomSheetLayout.subCategoryDescriptionTv.clearFocus()
 
                 addSubCategoryItemToDB()
 
-                bottomSheetSubCategoryName.text = null
-                bottomSheetSubCategoryDescription.text = null
+                binding.bottomSheetLayout.subCategoryNameTV.text = null
+                binding.bottomSheetLayout.subCategoryDescriptionTv.text = null
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -207,12 +172,12 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
         val item = SubCategoryListModel(
             subtaskItemId = Date().time,
             categoryId = CategoryId,
-            subtaskName = bottomSheetSubCategoryName.text.toString(),
-            subtaskDescription = bottomSheetSubCategoryDescription.text.toString(),
+            subtaskName = binding.bottomSheetLayout.subCategoryNameTV.text.toString(),
+            subtaskDescription = binding.bottomSheetLayout.subCategoryDescriptionTv.text.toString(),
             isTaskDone = false,
             isImportant = false
         )
-        if (!bottomSheetSubCategoryName.text.trim().isNullOrEmpty()) {
+        if (!binding.bottomSheetLayout.subCategoryNameTV.text.trim().isNullOrEmpty()) {
             addSubCategoryItemToDB(item)
         } else {
             subCategoryViewModel.errorModel.value = "Task Name cannot be null"
