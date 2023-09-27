@@ -5,12 +5,13 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="recyclerViewBG">#F6F6F6</color>
-    <color name="taskCompletedColor">#fafafa</color>
+
+    <color name="recyclerViewBG">#000000</color>
+    <color name="taskCompletedColor">#131313</color>
     <color name="swipe_background_color">#F44336</color>
-    <color name="headerColor">#EEEEEE</color>
+    <color name="headerColor">#1A1A1A</color>
     <color name="toolbarColor">@color/purple_500</color>
     <color name="toolbarTitleColor">#FFFFFF</color>
-    <color name="app_text_color">@color/black</color>
-    <color name="recycler_row_view_bg">@color/white</color>
+    <color name="app_text_color">@color/white</color>
+    <color name="recycler_row_view_bg">#3A3939</color>
 </resources>

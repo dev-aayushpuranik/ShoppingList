@@ -12,11 +12,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.orDefaut
 import com.aayush.shoppingapp.common.helper.UIHelper
 import com.aayush.shoppingapp.common.helpers.SwipeHelper
 import com.aayush.shoppingapp.databinding.FragmentSubtaskListBinding
+import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import com.aayush.shoppingapp.viewModels.SubCategoryViewModel
 import com.aayush.shoppingapp.views.adapter.SubCategoryAdapter
@@ -27,7 +29,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
+class SubtaskListFragment(private val CategoryModel: CategoryModel) : Fragment() {
     private lateinit var subCategoryViewModel: SubCategoryViewModel
 
     private lateinit var binding: FragmentSubtaskListBinding
@@ -54,11 +56,15 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
     }
 
     private fun loadData() {
-        subCategoryViewModel.mCategoryId = CategoryId
+        subCategoryViewModel.mCategoryId = CategoryModel.CategoryId
         subCategoryViewModel.getSubCategoriesFromDB(requireContext())
     }
 
     private fun setView() {
+        (requireActivity() as MainActivity).setToolbar(CategoryModel.CategoryName) {
+            parentFragmentManager.popBackStack()
+            (requireActivity() as MainActivity).setToolbar(getString(R.string.app_name), null)
+        }
         pendingTaskAdapter = SubCategoryAdapter(requireContext(), {
 
         }, {
@@ -71,12 +77,11 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 val item: SubCategoryListModel = pendingTaskAdapter.data[viewHolder.adapterPosition]
                 deleteSubCategoryItemFromDB(item)
-                Snackbar.make(binding.subtaskRV, "Deleted " + item.subtaskName, Snackbar.LENGTH_LONG)
-                    .setAction("Undo") {
-                        addSubCategoryItemToDB(item)
-                        pendingTaskAdapter.notifyItemRangeChanged(0,
-                            subCategoryViewModel.subCategories.value?.size.orDefaut())
-                    }.show()
+                UIHelper.snackBar(binding.subtaskRV, "Deleted " + item.subtaskName, "Undo") {
+                    addSubCategoryItemToDB(item)
+                    pendingTaskAdapter.notifyItemRangeChanged(0,
+                        subCategoryViewModel.subCategories.value?.size.orDefaut())
+                }
             })
 
         val pendingItemTouchHelper = ItemTouchHelper(sh)
@@ -137,19 +142,19 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
     }
 
     private fun setAddSubCategoryView() {
-        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout.addSubcategoryView)
+        bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout.addCategoryView)
         setBottomSheetStateCollapse()
 
-        binding.bottomSheetLayout.saveSubCategoryItemBtn.setOnClickListener {
-            if (binding.bottomSheetLayout.subCategoryNameTV.text.toString().trim().isNotEmpty()) {
+        binding.bottomSheetLayout.saveTaskBtn.setOnClickListener {
+            if (binding.bottomSheetLayout.categoryNameTV.text.toString().trim().isNotEmpty()) {
                 setBottomSheetStateCollapse()
-                binding.bottomSheetLayout.subCategoryNameTV.clearFocus()
-                binding.bottomSheetLayout.subCategoryDescriptionTv.clearFocus()
+                binding.bottomSheetLayout.categoryNameTV.clearFocus()
+                binding.bottomSheetLayout.categoryDescriptionTv.clearFocus()
 
                 addSubCategoryItemToDB()
 
-                binding.bottomSheetLayout.subCategoryNameTV.text = null
-                binding.bottomSheetLayout.subCategoryDescriptionTv.text = null
+                binding.bottomSheetLayout.categoryNameTV.text = null
+                binding.bottomSheetLayout.categoryDescriptionTv.text = null
             } else {
                 Toast.makeText(
                     requireContext(),
@@ -171,13 +176,13 @@ class SubtaskListFragment(private val CategoryId: Long) : Fragment() {
     private fun addSubCategoryItemToDB() {
         val item = SubCategoryListModel(
             subtaskItemId = Date().time,
-            categoryId = CategoryId,
-            subtaskName = binding.bottomSheetLayout.subCategoryNameTV.text.toString(),
-            subtaskDescription = binding.bottomSheetLayout.subCategoryDescriptionTv.text.toString(),
+            categoryId = CategoryModel.CategoryId,
+            subtaskName = binding.bottomSheetLayout.categoryNameTV.text.toString(),
+            subtaskDescription = binding.bottomSheetLayout.categoryDescriptionTv.text.toString(),
             isTaskDone = false,
             isImportant = false
         )
-        if (!binding.bottomSheetLayout.subCategoryNameTV.text.trim().isNullOrEmpty()) {
+        if (!binding.bottomSheetLayout.categoryNameTV.text.trim().isNullOrEmpty()) {
             addSubCategoryItemToDB(item)
         } else {
             subCategoryViewModel.errorModel.value = "Task Name cannot be null"

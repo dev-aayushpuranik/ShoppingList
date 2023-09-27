@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#E7E7E7">
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -63,7 +62,8 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.0"
                         app:layout_constraintStart_toStartOf="@+id/completedListHeader"
-                        app:layout_constraintTop_toTopOf="parent" />
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/app_text_color"/>
 
                     <TextView
                         android:id="@+id/completedListHeader"
@@ -72,9 +72,7 @@
                         android:gravity="center"
                         android:maxLines="5"
                         android:text="@string/completed_tasks"
-                        android:textColor="@color/black"
-                        android:textSize="14sp"
-                        android:textStyle="bold"
+                        style="@style/HeaderTextStyle"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
@@ -94,8 +92,8 @@
             android:id="@+id/addSubTaskFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="50dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
             android:clickable="true"
             android:contentDescription="@string/app_name"
             android:elevation="@dimen/cardview_compat_inset_shadow"
@@ -108,5 +106,5 @@
 
     <include
         android:id="@+id/bottomSheetLayout"
-        layout="@layout/add_subcategory_bottom_sheet" />
+        layout="@layout/bottom_sheet_layout" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

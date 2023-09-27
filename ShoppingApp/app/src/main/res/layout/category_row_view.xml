@@ -4,9 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/recycler_row_view_bg"
     app:cardCornerRadius="10dp"
-    android:layout_margin="5dp"
-    app:cardBackgroundColor="@color/white">
+    android:layout_margin="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -19,6 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="10dp"
+            app:tint="@color/app_text_color"
             android:src="@drawable/ic_baseline_format_list_bulleted_24"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -28,9 +29,7 @@
             android:id="@+id/categoryNameTV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            android:textStyle="bold"
+            style="@style/ListTitleTextStyle"
             app:layout_constraintBottom_toTopOf="@+id/DiscriptionNameTV"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -41,8 +40,7 @@
             android:id="@+id/DiscriptionNameTV"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="@color/black"
-            android:textSize="12sp"
+            style="@style/DescriptionTextStyle"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

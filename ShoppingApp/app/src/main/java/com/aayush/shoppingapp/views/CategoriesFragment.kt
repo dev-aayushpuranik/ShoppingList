@@ -48,7 +48,7 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setView() {
-        mAdapter = CategoryAdapter { navigateToSubTaskList(it.CategoryId) }
+        mAdapter = CategoryAdapter { navigateToSubTaskList(it) }
         binding.categoriesRV.adapter = mAdapter
         binding.categoriesRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
@@ -107,13 +107,10 @@ class CategoriesFragment : Fragment() {
             }
 
             override fun onStateChanged(bottomSheet: View, newState: Int) {
-                var title = getString(R.string.add_new_list)
                 if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_COLLAPSED) {
-                    title += ""
-                    binding.bottomSheetLayout.addCategoryTitle.text = title
+
                 } else if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                    title += "(+)"
-                    binding.bottomSheetLayout.addCategoryTitle.text = title
+
                 }
             }
         })
@@ -166,9 +163,9 @@ class CategoriesFragment : Fragment() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
     }
 
-    private fun navigateToSubTaskList(categoryId: Long) {
+    private fun navigateToSubTaskList(category: CategoryModel) {
         parentFragmentManager.beginTransaction()
-            .replace(R.id.container, SubtaskListFragment(categoryId))
+            .replace(R.id.container, SubtaskListFragment(category))
             .addToBackStack("SubtaskListFragmentStack")
             .commit()
     }

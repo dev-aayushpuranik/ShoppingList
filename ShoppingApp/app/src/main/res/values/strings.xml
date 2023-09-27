@@ -13,4 +13,8 @@
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="arrowicon">arrowIcon</string>
+    <string name="backbutton">backButton</string>
+    <string name="Settings">Settings</string>
+    <string name="category_name">Category Name</string>
+    <string name="add_description_optional">Add description(optional)</string>
 </resources>

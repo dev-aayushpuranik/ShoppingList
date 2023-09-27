@@ -4,15 +4,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/recycler_row_view_bg"
     android:layout_margin="5dp"
-    app:cardBackgroundColor="@color/white"
     app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:background="@color/white">
+        android:layout_margin="5dp">
 
         <ImageView
             android:id="@+id/is_completed_iv"
@@ -30,7 +29,7 @@
             android:layout_height="wrap_content"
             android:maxLines="5"
             android:paddingVertical="5dp"
-            android:textSize="14sp"
+            style="@style/ListTitleTextStyle"
             app:layout_constraintBottom_toTopOf="@+id/subCategoryDescriptionTvTv"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
@@ -44,7 +43,8 @@
             android:layout_marginTop="5dp"
             android:maxLines="5"
             android:paddingVertical="5dp"
-            android:textSize="12sp"
+            style="@style/DescriptionTextStyle"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"

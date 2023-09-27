@@ -1,72 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/add_Subcategory_view"
+    android:id="@+id/add_category_view"
     android:layout_width="match_parent"
     android:layout_height="250dp"
-    android:background="@color/white"
+    android:background="@color/recycler_row_view_bg"
     android:clickable="true"
     app:behavior_hideable="true"
     app:behavior_peekHeight="36dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
     <EditText
-        android:id="@+id/subCategoryNameTV"
+        android:id="@+id/categoryNameTV"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:hint="@string/item_name"
-        android:textColor="#292929"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/subCategoryDescriptionTv"
+        android:hint="@string/category_name"
+        style="@style/ListTitleTextStyle"
+        app:layout_constraintBottom_toTopOf="@+id/categoryDescriptionTv"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/addSubCategoryTitle" />
+        app:layout_constraintTop_toBottomOf="@+id/addCategoryTitle"
+        android:autofillHints=""
+        android:inputType="textAutoComplete" />
 
     <EditText
-        android:id="@+id/subCategoryDescriptionTv"
+        android:id="@+id/categoryDescriptionTv"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:hint="@string/item_description_optional"
-        android:textColor="#292929"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toTopOf="@+id/saveSubCategoryItemBtn"
+        android:hint="@string/add_description_optional"
+        style="@style/ListTitleTextStyle"
+        app:layout_constraintBottom_toTopOf="@+id/saveTaskBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/subCategoryNameTV" />
+        app:layout_constraintTop_toBottomOf="@+id/categoryNameTV"
+        android:autofillHints=""
+        android:inputType="text" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="35dp"
         android:layout_height="0dp"
-        android:layout_marginStart="24dp"
-        app:layout_constraintBottom_toBottomOf="@+id/subCategoryDescriptionTv"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="@+id/categoryDescriptionTv"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/subCategoryNameTV"
-        app:srcCompat="@drawable/ic_baseline_exposure_plus_1_24" />
+        app:layout_constraintTop_toTopOf="@+id/categoryNameTV"
+        app:srcCompat="@drawable/ic_baseline_exposure_plus_1_24"
+        app:tint="@color/app_text_color"
+        android:contentDescription="@string/app_name" />
 
     <TextView
-        android:id="@+id/addSubCategoryTitle"
+        android:id="@+id/addCategoryTitle"
         android:layout_width="match_parent"
         android:layout_height="36dp"
         android:background="@color/headerColor"
         android:gravity="center"
+        style="@style/HeaderTextStyle"
         android:text="@string/add_new_Item"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/saveSubCategoryItemBtn"
+        android:id="@+id/saveTaskBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save"
+        android:padding="10dp"
+        android:textColor="@color/toolbarTitleColor"
+        android:background="@color/toolbarColor"
+        android:textSize="14sp"
+        style="@style/Widget.AppCompat.Button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/subCategoryDescriptionTv"
+        app:layout_constraintEnd_toEndOf="@+id/categoryDescriptionTv"
         app:layout_constraintStart_toStartOf="@+id/imageView"
-        app:layout_constraintTop_toBottomOf="@+id/subCategoryDescriptionTv" />
+        app:layout_constraintTop_toBottomOf="@+id/categoryDescriptionTv" />
 </androidx.constraintlayout.widget.ConstraintLayout>
