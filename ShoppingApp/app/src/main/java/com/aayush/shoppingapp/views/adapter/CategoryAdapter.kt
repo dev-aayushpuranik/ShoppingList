@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.orDefaut
+import com.aayush.shoppingapp.databinding.CategoryRowViewBinding
 import com.aayush.shoppingapp.models.CategoryModel
 
 class CategoryAdapter(
@@ -21,8 +22,8 @@ class CategoryAdapter(
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, type: Int): CategoryViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.category_row_view, parent, false)
-        return CategoryViewHolder(view) { index ->
+        val binding = CategoryRowViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return CategoryViewHolder(binding) { index ->
             onItemClick(data[index])
         }
     }
@@ -36,8 +37,8 @@ class CategoryAdapter(
     }
 }
 
-class CategoryViewHolder(view: View, onItemClick: (Int) -> Unit):
-    RecyclerView.ViewHolder(view) {
+class CategoryViewHolder(private val binding: CategoryRowViewBinding, onItemClick: (Int) -> Unit):
+    RecyclerView.ViewHolder(binding.root) {
     init {
         itemView.setOnClickListener {
             onItemClick(adapterPosition)
@@ -45,9 +46,8 @@ class CategoryViewHolder(view: View, onItemClick: (Int) -> Unit):
     }
 
     fun bind(model: CategoryModel) {
-        itemView.findViewById<TextView>(R.id.categoryNameTV).text = model.CategoryName
-        itemView.findViewById<TextView>(R.id.DiscriptionNameTV).text = model.Description
-
-        itemView.findViewById<TextView>(R.id.DiscriptionNameTV).SetViewVisible(model.Description.isNotEmpty())
+        binding.categoryNameTV.text = model.CategoryName
+        binding.DiscriptionNameTV.text = model.Description
+        binding.DiscriptionNameTV.SetViewVisible(model.Description.isNotEmpty())
     }
 }
