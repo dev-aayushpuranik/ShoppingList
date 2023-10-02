@@ -17,6 +17,9 @@ interface SubcategoryDao {
     @Query("SELECT * FROM SubcategoryTable where categoryId=:catId")
     fun getAll(catId: Long): List<SubcategoryTable>?
 
+    @Query("SELECT * FROM SubcategoryTable")
+    fun getAllSubCategories(): List<SubcategoryTable>?
+
     @Update(onConflict = OnConflictStrategy.REPLACE)
     fun updateTaskDoneForSubCategory(subcategoryTable: SubcategoryTable)
 }
