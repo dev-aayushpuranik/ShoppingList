@@ -16,7 +16,7 @@ fun <T>ArrayList<T>?.orDefault() : ArrayList<T> {
 
 // region Int extension
 
-fun Int?.orDefaut(): Int{
+fun Int?.orDefault(): Int{
     return this ?: 0
 }
 
@@ -25,7 +25,7 @@ fun Int?.orDefaut(): Int{
 
 // region String extension
 
-fun String?.orDefaut(): String{
+fun String?.orDefault(): String{
     return if(this != null && this.isNotEmpty()) this else ""
 }
 
