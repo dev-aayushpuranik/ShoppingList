@@ -2,11 +2,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/add_category_view"
+    style="@style/ThemeOverlay.YourApp.BottomSheetDialog"
     android:layout_width="match_parent"
     android:layout_height="250dp"
-    android:clickable="true"
-    style="@style/ThemeOverlay.YourApp.BottomSheetDialog"
     android:background="@drawable/rounded_corners"
+    android:clickable="true"
     app:behavior_hideable="true"
     app:behavior_peekHeight="40dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -38,57 +38,54 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/subTaskNameInputLayout"
-        style="@style/BottomSheetTextStyle"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:autofillHints=""
-        android:hint="@string/item_description_optional"
-        android:inputType="textAutoComplete"
-        app:hintEnabled="true"
-        app:hintAnimationEnabled="true"
-        app:expandedHintEnabled="true"
-        android:textColorHint="@color/app_text_color"
-        android:layout_marginHorizontal="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/saveTaskBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <EditText
-            android:id="@+id/categoryDescriptionTv"
-            style="@style/BottomSheetTextStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:textColorHint="@color/app_text_color"
-            android:textColor="@color/app_text_color"/>
-    </com.google.android.material.textfield.TextInputLayout>
-
-    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/categoryNameLayout"
+        style="@style/BottomSheetTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
         android:hint="@string/add_new_Item"
-        style="@style/BottomSheetTextStyle"
-        app:hintEnabled="true"
-        app:hintAnimationEnabled="true"
-        app:expandedHintEnabled="true"
         android:textColorHint="@color/app_text_color"
+        app:expandedHintEnabled="true"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
         app:layout_constraintBottom_toTopOf="@+id/subTaskNameInputLayout"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/addCategoryTitle" >
+        app:layout_constraintTop_toBottomOf="@+id/addCategoryTitle">
 
         <androidx.appcompat.widget.AppCompatEditText
             android:id="@+id/categoryNameTV"
             style="@style/BottomSheetTextStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:textColorHint="@color/app_text_color"
-            android:textColor="@color/app_text_color"
-            />
+            android:maxLines="3"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/subTaskNameInputLayout"
+        style="@style/BottomSheetTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="8dp"
+        android:autofillHints=""
+        android:hint="@string/item_description_optional"
+        android:inputType="textAutoComplete"
+        android:textColorHint="@color/app_text_color"
+        app:expandedHintEnabled="true"
+        app:hintAnimationEnabled="true"
+        app:hintEnabled="true"
+        app:layout_constraintBottom_toTopOf="@+id/saveTaskBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/categoryNameLayout">
+
+        <androidx.appcompat.widget.AppCompatEditText
+            android:id="@+id/categoryDescriptionTv"
+            style="@style/BottomSheetTextStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints="" />
     </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
