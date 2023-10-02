@@ -2,11 +2,8 @@ package com.aayush.shoppingapp.Repository
 
 import android.content.Context
 import com.aayush.shoppingapp.common.extensions.orDefault
-import com.aayush.shoppingapp.database.CategoryDatabase
 import com.aayush.shoppingapp.database.SubCategoryDatabase
-import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
-import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +27,14 @@ class SubCategoryRepository {
             val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
 
             withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAll(categoryId).orDefault()) }
+        }
+    }
+
+    fun getAllSubCategoriesFromDB(context: Context, callback:(List<SubcategoryTable>) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
+
+            withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAllSubCategories().orDefault()) }
         }
     }
 
