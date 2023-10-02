@@ -1,13 +1,13 @@
 package com.aayush.shoppingapp.views
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.WindowManager
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.aayush.shoppingapp.OnDayNightStateChanged
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.databinding.ActivityMainBinding
@@ -31,7 +31,19 @@ class MainActivity : AppCompatActivity() {
             .beginTransaction()
             .replace(R.id.container, CategoriesFragment()).commit()
 
-        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+        registerBackPressEvent()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        binding.root.setBackgroundColor(ContextCompat.getColor(this, R.color.recyclerViewBG))
+
+        supportFragmentManager.fragments.forEach {
+            if(it is OnDayNightStateChanged) {
+                it.onDayNightApplied(state = nightModeFlags)
+            }
+        }
     }
 
     fun setToolbar(title: String, onBackPress: (() -> Unit?)?) {
@@ -40,26 +52,33 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.toolbarBackArrow.setOnClickListener { onBackPress?.invoke() }
     }
 
+    fun registerBackPressEvent() {
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+    }
+
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-
             try {
                 if (supportFragmentManager.fragments.size > 0 && (supportFragmentManager.fragments[0] is SubtaskListFragment)) {
                     supportFragmentManager.popBackStack()
                 } else {
-                    AlertDialog.Builder(this@MainActivity)
-                        .setMessage(getString(R.string.are_you_sure_you_want_to_exit))
-                        .setCancelable(false)
-                        .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                            finishAndRemoveTask()
-                        }
-                        .setNegativeButton(getString(R.string.no), null)
-                        .show()
+                    showAlertDialog()
                 }
             } catch (ex: Exception) {
                 ex.printStackTrace()
             }
         }
+    }
+
+    private fun showAlertDialog() {
+        AlertDialog.Builder(this@MainActivity)
+            .setMessage(getString(R.string.are_you_sure_you_want_to_exit))
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                finishAndRemoveTask()
+            }
+            .setNegativeButton(getString(R.string.no), null)
+            .show()
     }
 
 }
