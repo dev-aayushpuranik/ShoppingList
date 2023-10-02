@@ -13,24 +13,23 @@ import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.databinding.SubcategoryRowViewBinding
 import com.aayush.shoppingapp.models.SubCategoryListModel
 
-class SubCategoryAdapter(
+class SubCategoryCompletedTaskAdapter(
     private val context: Context,
     private val onImportantItemClick: (SubCategoryListModel) -> Unit,
     private val onTaskDoneIconClick: (SubCategoryListModel) -> Unit
-) : RecyclerView.Adapter<SubCategoryAdapter.SubCategoryViewHolder>() {
+) : RecyclerView.Adapter<SubCategoryCompletedTaskAdapter.SubCategoryCompletedTaskViewHolder>() {
 
-    var data: List<SubCategoryListModel> = arrayListOf()
+    var data: List<SubCategoryListModel> = ArrayList(0)
         set(value) {
             field = value
             notifyDataSetChanged()
         }
 
-    class SubCategoryViewHolder(
-        private val binding:SubcategoryRowViewBinding,
+    class SubCategoryCompletedTaskViewHolder(
+        private val binding: SubcategoryRowViewBinding,
         onImportantItemClick: (Int) -> Unit,
         onTaskDoneIconClick: (Int) -> Unit
-    ) :
-        RecyclerView.ViewHolder(binding.root) {
+    ) : RecyclerView.ViewHolder(binding.root) {
         init {
             binding.isImportantIv.setOnClickListener { onImportantItemClick(adapterPosition) }
             binding.isCompletedIv.setOnClickListener { onTaskDoneIconClick(adapterPosition) }
@@ -46,35 +45,64 @@ class SubCategoryAdapter(
 
             val importantIcon: Int =
                 if (subCategoryModel.isImportant) R.drawable.important_icon else R.drawable.unimportant_icon
-            binding.isImportantIv.setImageDrawable(ContextCompat.getDrawable(context, importantIcon))
+            binding.isImportantIv.setImageDrawable(
+                ContextCompat.getDrawable(
+                    context,
+                    importantIcon
+                )
+            )
 
 
-            val value = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10F, context.resources.displayMetrics)
+            val value = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                10F,
+                context.resources.displayMetrics
+            )
             binding.cardView.radius = value
             binding.cardView.preventCornerOverlap = true
             binding.cardView.useCompatPadding = true
 
             setColorForViewAndText(context)
         }
+
         private fun setDataForRow(subCategoryModel: SubCategoryListModel) {
             binding.subCategoryTitleTv.text = subCategoryModel.subtaskName
             binding.subCategoryDescriptionTvTv.text = subCategoryModel.subtaskDescription
             binding.subCategoryDescriptionTvTv.SetViewVisible(subCategoryModel.subtaskDescription.isNotEmpty())
         }
+
         private fun setColorForViewAndText(context: Context) {
-            binding.cardView.background = ContextCompat.getDrawable(context, R.drawable.rounded_corners)
-            binding.isCompletedIv.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.app_text_color))
-            binding.subCategoryTitleTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
-            binding.subCategoryDescriptionTvTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
+            binding.cardView.background =
+                ContextCompat.getDrawable(context, R.drawable.rounded_corners)
+            binding.isCompletedIv.imageTintList =
+                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.app_text_color))
+            binding.subCategoryTitleTv.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.app_text_color
+                )
+            )
+            binding.subCategoryDescriptionTvTv.setTextColor(
+                ContextCompat.getColor(
+                    context,
+                    R.color.app_text_color
+                )
+            )
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubCategoryViewHolder {
-        val binding =
-            SubcategoryRowViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return SubCategoryViewHolder(binding,
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubCategoryCompletedTaskViewHolder {
+        val binding = SubcategoryRowViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+
+        return SubCategoryCompletedTaskViewHolder(binding,
             { index -> onImportantItemClicked(data[index]) },
             { index -> onDoneItemClicked(data[index]) })
+    }
+
+    override fun onBindViewHolder(holder: SubCategoryCompletedTaskViewHolder, position: Int) {
+        holder.bind(context, data[position])
     }
 
     private fun onDoneItemClicked(item: SubCategoryListModel) {
@@ -85,10 +113,6 @@ class SubCategoryAdapter(
     private fun onImportantItemClicked(item: SubCategoryListModel) {
         item.isImportant = !item.isImportant
         onImportantItemClick(item)
-    }
-
-    override fun onBindViewHolder(holder: SubCategoryViewHolder, position: Int) {
-        holder.bind(context, data[position])
     }
 
     override fun getItemCount(): Int {
