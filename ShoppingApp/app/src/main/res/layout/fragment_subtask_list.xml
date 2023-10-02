@@ -92,15 +92,14 @@
             android:id="@+id/addSubTaskFAB"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="24dp"
             android:clickable="true"
-            android:contentDescription="@string/app_name"
-            android:elevation="@dimen/cardview_compat_inset_shadow"
-            android:src="@drawable/ic_baseline_add_24"
+            android:backgroundTint="@color/toolbarColor"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            tools:ignore="ImageContrastCheck" />
+            app:srcCompat="@drawable/ic_baseline_add_24"
+            android:contentDescription="@string/app_name" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

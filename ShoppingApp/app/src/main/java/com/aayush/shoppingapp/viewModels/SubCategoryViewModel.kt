@@ -9,7 +9,6 @@ import com.aayush.shoppingapp.models.SubCategoryListModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SubCategoryViewModel: ViewModel() {
 
@@ -22,8 +21,8 @@ class SubCategoryViewModel: ViewModel() {
     val errorModel: MutableLiveData<String> by lazy {
         MutableLiveData<String>()
     }
-
     var mCategoryId: Long = 0
+    var completedTaskHeight = 0;
 
     fun addNewSubCategoryItem(context: Context, subtaskListModel: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
@@ -63,10 +62,30 @@ class SubCategoryViewModel: ViewModel() {
     }
 
     fun getSubCategoriesFromDB(requireContext: Context) {
+        if(mCategoryId == 0L) {
+            mRepo?.getAllSubCategoriesFromDB(requireContext) {
+                val arrayList = arrayListOf<SubCategoryListModel>()
+                arrayList.clear()
+                arrayList.addAll(getSubCategories(it).filter { it.isImportant })
+                CoroutineScope(Dispatchers.Main).launch {
+                    subCategories.value = arrayList.toList()
+                }
+            }
+
+            return
+        }
         CoroutineScope(Dispatchers.IO).launch {
             mRepo?.getSubCategories(requireContext, mCategoryId) {
                 CoroutineScope(Dispatchers.Main).launch {
-                    subCategories.value = getSubCategories(it)
+                    val arrayList = arrayListOf<SubCategoryListModel>()
+                    getSubCategories(it).forEach {
+                        if(it.isImportant) {
+                            arrayList.add(0, it)
+                        } else {
+                            arrayList.add(it)
+                        }
+                    }
+                    subCategories.value = arrayList.toList()
                 }
             }
         }
