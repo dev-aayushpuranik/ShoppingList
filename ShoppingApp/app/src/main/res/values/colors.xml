@@ -13,4 +13,5 @@
     <color name="toolbarTitleColor">#FFFFFF</color>
     <color name="app_text_color">@color/black</color>
     <color name="recycler_row_view_bg">@color/white</color>
+    <color name="impotant_color">#F8D35A</color>
 </resources>
