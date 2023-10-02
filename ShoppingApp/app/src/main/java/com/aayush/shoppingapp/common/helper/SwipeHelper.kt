@@ -8,15 +8,17 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.Callback
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.models.CategoryModel
 
 
 class SwipeHelper(
     val context: Context,
+    val list: List<CategoryModel>?,
     val onDeleteSwipe: (viewHolder: RecyclerView.ViewHolder, direction: Int) -> Unit
 ) : Callback() {
 
 
-    var mContext: Context? = null
+    private var mContext: Context? = null
     private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_delete_24)
     private var intrinsicWidth = deleteIcon?.intrinsicWidth
     private var intrinsicHeight = deleteIcon?.intrinsicHeight
@@ -52,44 +54,54 @@ class SwipeHelper(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        val itemView = viewHolder.itemView
-        val itemHeight = itemView.bottom - itemView.top
-        val isCanceled = dX == 0f && !isCurrentlyActive
+        if(isSwipeEnabled(viewHolder.adapterPosition)) {
+            val itemView = viewHolder.itemView
+            val itemHeight = itemView.bottom - itemView.top
+            val isCanceled = dX == 0f && !isCurrentlyActive
 
-        if (isCanceled) {
-            clearCanvas(
-                c,
-                itemView.right + dX,
-                itemView.top.toFloat(),
-                itemView.right.toFloat(),
-                itemView.bottom.toFloat()
+            if (isCanceled) {
+                clearCanvas(
+                    c,
+                    itemView.right + dX,
+                    itemView.top.toFloat(),
+                    itemView.right.toFloat(),
+                    itemView.bottom.toFloat()
+                )
+                super.onChildDraw(
+                    c,
+                    recyclerView,
+                    viewHolder,
+                    dX,
+                    dY,
+                    actionState,
+                    isCurrentlyActive
+                )
+                return
+            }
+
+            // Draw the red delete background
+            background.color = backgroundColor
+            background.setBounds(
+                itemView.right + dX.toInt(),
+                itemView.top,
+                itemView.right,
+                itemView.bottom
             )
+            background.draw(c)
+
+            // Calculate position of delete icon
+            val deleteIconTop = itemView.top + (itemHeight - (intrinsicHeight ?: 0)) / 2
+            val deleteIconMargin = (itemHeight - (intrinsicHeight ?: 0)) / 2
+            val deleteIconLeft = itemView.right - deleteIconMargin - (intrinsicWidth ?: 0)
+            val deleteIconRight = itemView.right - deleteIconMargin
+            val deleteIconBottom = deleteIconTop + (intrinsicHeight ?: 0)
+
+            // Draw the delete icon
+            deleteIcon?.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
+            deleteIcon?.draw(c)
+
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-            return
         }
-
-        // Draw the red delete background
-        background.color = backgroundColor
-        background.setBounds(
-            itemView.right + dX.toInt(),
-            itemView.top,
-            itemView.right,
-            itemView.bottom
-        )
-        background.draw(c)
-
-        // Calculate position of delete icon
-        val deleteIconTop = itemView.top + (itemHeight - (intrinsicHeight ?: 0)) / 2
-        val deleteIconMargin = (itemHeight - (intrinsicHeight ?: 0)) / 2
-        val deleteIconLeft = itemView.right - deleteIconMargin - (intrinsicWidth ?: 0)
-        val deleteIconRight = itemView.right - deleteIconMargin
-        val deleteIconBottom = deleteIconTop + (intrinsicHeight ?: 0)
-
-        // Draw the delete icon
-        deleteIcon?.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
-        deleteIcon?.draw(c)
-
-        super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
     }
 
     private fun clearCanvas(c: Canvas?, left: Float, top: Float, right: Float, bottom: Float) {
@@ -113,5 +125,13 @@ class SwipeHelper(
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         onDeleteSwipe(viewHolder, direction)
+    }
+
+    private fun isSwipeEnabled(position: Int): Boolean {
+        return if(list == null) {
+            true
+        } else {
+            (list.isNotEmpty() && list[0].CategoryId != 0L)
+        }
     }
 }
