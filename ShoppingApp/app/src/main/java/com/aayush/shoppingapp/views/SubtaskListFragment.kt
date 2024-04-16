@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.OnDayNightStateChanged
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
+import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.common.helper.UIHelper
 import com.aayush.shoppingapp.common.helpers.SwipeHelper
 import com.aayush.shoppingapp.databinding.FragmentSubtaskListBinding
@@ -29,6 +30,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Collections
 import java.util.Date
 
 
@@ -83,6 +85,8 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
         }, {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
+        }, {
+            subCategoryViewModel?.updateCategoryItem(requireContext(), it)
         })
         binding.subtaskRV.adapter = pendingTaskAdapter
         binding.subtaskRV.layoutManager =
@@ -98,7 +102,9 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             })
         val pendingItemTouchHelper = ItemTouchHelper(sh)
         pendingItemTouchHelper.attachToRecyclerView(binding.subtaskRV)
-
+//        val callback: ItemTouchHelper.Callback = simpleCallback
+//        val touchHelper = ItemTouchHelper(callback)
+//        touchHelper.attachToRecyclerView(binding.subtaskRV)
 
         completedTaskAdapter = SubCategoryCompletedTaskAdapter(requireContext(), {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
@@ -119,6 +125,9 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                     completedTaskAdapter.notifyDataSetChanged()
                 }
             })
+//        val callback2: ItemTouchHelper.Callback = simpleCallback
+//        val touchHelper2 = ItemTouchHelper(callback2)
+//        touchHelper2.attachToRecyclerView(binding.completedSubtaskRV)
 
         val completedITH = ItemTouchHelper(completedSh)
         completedITH.attachToRecyclerView(binding.completedSubtaskRV)
@@ -135,6 +144,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                 if(pendingTaskAdapter.data.isEmpty() && completedTaskAdapter.data.isEmpty()) { setBottomSheetStateExpand() } else setBottomSheetStateCollapse()
                 val completedItems = arrayListOf<SubCategoryListModel>()
                 val pendingItems = arrayListOf<SubCategoryListModel>()
+                binding.noTaskView.SetViewVisible(it.isEmpty())
                 for(i in 0 until it.count()) {
                     val item = it[i]
                     if(item.isTaskDone) {
@@ -212,7 +222,8 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                 subtaskName = binding.bottomSheetLayout.categoryNameTV.text.toString(),
                 subtaskDescription = binding.bottomSheetLayout.categoryDescriptionTv.text.toString(),
                 isTaskDone = false,
-                isImportant = false
+                isImportant = false,
+                priorityId = subCategoryViewModel?.subCategories?.value?.size.orDefault()
             )
             if (!binding.bottomSheetLayout.categoryNameTV.text?.trim().isNullOrEmpty()) {
                 addSubCategoryItemToDB(item)
@@ -225,7 +236,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
 
     private fun navigateToPreviousScreen() {
         try {
-            requireFragmentManager().popBackStack()
+            parentFragmentManager.popBackStack()
             (requireActivity() as MainActivity).setToolbar(getString(R.string.app_name), null)
         } catch (ex: Exception) {
             ex.printStackTrace()
@@ -268,4 +279,26 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
         super.onDestroyView()
         ((requireActivity() as MainActivity).registerBackPressEvent())
     }
+
+
+//    private var simpleCallback: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(
+//        ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
+//        0
+//    ) {
+//        override fun onMove(
+//            recyclerView: RecyclerView,
+//            viewHolder: RecyclerView.ViewHolder,
+//            target: RecyclerView.ViewHolder
+//        ): Boolean {
+//            val fromPosition = viewHolder.adapterPosition
+//            val toPosition = target.adapterPosition
+//            Collections.swap(subCategoryViewModel?.subCategories?.value.orDefault(), fromPosition, toPosition)
+//            pendingTaskAdapter.notifyItemMoved(fromPosition, toPosition)
+//            completedTaskAdapter.notifyItemMoved(fromPosition, toPosition)
+//
+//            return false
+//        }
+//
+//        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+//    }
 }
