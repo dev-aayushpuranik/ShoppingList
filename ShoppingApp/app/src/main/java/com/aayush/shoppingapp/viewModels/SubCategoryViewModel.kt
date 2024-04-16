@@ -63,9 +63,10 @@ class SubCategoryViewModel: ViewModel() {
 
     fun getSubCategoriesFromDB(requireContext: Context) {
         if(mCategoryId == 0L) {
-            mRepo?.getAllSubCategoriesFromDB(requireContext) {
+            mRepo?.getAllSubCategoriesFromDB(requireContext) { it ->
                 val arrayList = arrayListOf<SubCategoryListModel>()
                 arrayList.clear()
+                arrayList.addAll(getSubCategories(it).sortedBy { it.priorityId })
                 arrayList.addAll(getSubCategories(it).filter { it.isImportant })
                 CoroutineScope(Dispatchers.Main).launch {
                     subCategories.value = arrayList.toList()
@@ -102,7 +103,7 @@ class SubCategoryViewModel: ViewModel() {
     private fun getSubCategory(table: SubcategoryTable?): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
         table?.let {
-            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant)
+            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, it.priorityId)
         }
         return model
     }
@@ -113,7 +114,7 @@ class SubCategoryViewModel: ViewModel() {
             model = SubcategoryTable(
                 it.subtaskItemId, it.categoryId,
                 it.subtaskName, it.subtaskDescription,
-                it.isTaskDone, it.isImportant)
+                it.isTaskDone, it.isImportant, it.priorityId)
         }
         return model
     }

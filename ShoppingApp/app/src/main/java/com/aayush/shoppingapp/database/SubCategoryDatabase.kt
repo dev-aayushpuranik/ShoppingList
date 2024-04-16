@@ -1,13 +1,14 @@
 package com.aayush.shoppingapp.database
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.aayush.shoppingapp.database.dao.SubcategoryDao
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 
-@Database(entities = [SubcategoryTable::class], version = 1)
+@Database(entities = [SubcategoryTable::class], version = 2)
 abstract class SubCategoryDatabase : RoomDatabase() {
 
     abstract fun SubcategoryDao(): SubcategoryDao
@@ -26,7 +27,7 @@ abstract class SubCategoryDatabase : RoomDatabase() {
                     context.applicationContext,
                     SubCategoryDatabase::class.java,
                     "SubCategoryDatabase"
-                ).build()
+                ).fallbackToDestructiveMigration().build()
                 INSTANCE = instance
                 // return instance
                 instance
