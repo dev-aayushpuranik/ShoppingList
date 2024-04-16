@@ -6,5 +6,6 @@ data class SubCategoryListModel(
     val subtaskName: String,
     val subtaskDescription: String,
     var isTaskDone: Boolean,
-    var isImportant: Boolean
+    var isImportant: Boolean,
+    val priorityId: Int
 )

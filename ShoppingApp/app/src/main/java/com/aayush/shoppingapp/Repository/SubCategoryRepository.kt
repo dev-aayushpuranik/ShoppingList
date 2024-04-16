@@ -63,9 +63,7 @@ class SubCategoryRepository {
     ) {
         try {
             val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
-
             subCategoryDatabase.insertAll(getAllSubCategories(subCategoryList))
-
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
@@ -113,6 +111,6 @@ class SubCategoryRepository {
     }
 
     private fun getSubCategoryTable(model: SubCategoryListModel) : SubcategoryTable {
-        return SubcategoryTable(model.subtaskItemId, model.categoryId, model.subtaskName, model.subtaskDescription, model.isTaskDone, model.isImportant)
+        return SubcategoryTable(model.subtaskItemId, model.categoryId, model.subtaskName, model.subtaskDescription, model.isTaskDone, model.isImportant, model.priorityId)
     }
 }
