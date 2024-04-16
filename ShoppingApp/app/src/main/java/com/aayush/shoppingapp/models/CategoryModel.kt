@@ -4,4 +4,5 @@ data class CategoryModel(
     val CategoryId: Long,
     val CategoryName: String,
     val Description: String,
+    val priorityId: Int
 )

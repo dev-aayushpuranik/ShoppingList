@@ -80,7 +80,7 @@ class CategoriesViewModel : ViewModel() {
     private fun getSubCategory(table: SubcategoryTable?): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
         table?.let {
-            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant)
+            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, it.priorityId)
         }
         return model
     }
@@ -94,7 +94,7 @@ class CategoriesViewModel : ViewModel() {
                 arrayList.addAll(getCategories(it))
 
                 if((subCategories.filter { it.isImportant }).isNotEmpty()) {
-                    val importantItem = CategoryModel(0, getString(context, R.string.important), "")
+                    val importantItem = CategoryModel(0, getString(context, R.string.important), "", 0)
                     arrayList.add(0, importantItem)
                 }
 
@@ -105,9 +105,7 @@ class CategoriesViewModel : ViewModel() {
 
     private fun getCategories(tables: List<CategoryTable>?): List<CategoryModel> {
         val arrayList = arrayListOf<CategoryModel>()
-        tables?.forEach {
-            getCategory(it)?.let { it1 -> arrayList.add(it1) }
-        }
+        tables?.forEach { getCategory(it)?.let { it1 -> arrayList.add(it1) } }
         return arrayList.toList()
     }
 
@@ -117,7 +115,8 @@ class CategoriesViewModel : ViewModel() {
             model = CategoryModel(
                 it.id,
                 it.CategoryTitle,
-                it.CategoryDescription
+                it.CategoryDescription,
+                it.priorityId
             )
         }
         return model

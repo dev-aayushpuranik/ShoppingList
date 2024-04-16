@@ -8,5 +8,6 @@ data class CategoryTable(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     val CategoryTitle: String,
-    val CategoryDescription: String
+    val CategoryDescription: String,
+    val priorityId: Int
 )
