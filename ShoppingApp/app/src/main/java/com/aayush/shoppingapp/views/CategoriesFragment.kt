@@ -72,6 +72,7 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         val categoryDataObserver = Observer<List<CategoryModel>> {
             CoroutineScope(Dispatchers.Main).launch {
                 binding.progressbar.SetViewVisible(false)
+                binding.noTaskView.SetViewVisible(it.isEmpty())
                 mAdapter.data = it
                 setRowSwipeForRV()
             }
@@ -123,7 +124,8 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         val categoryModel = CategoryModel(
             Date().time,
             binding.bottomSheetLayout.categoryNameTV.text.toString().trim(),
-            binding.bottomSheetLayout.categoryDescriptionTv.text.toString().trim()
+            binding.bottomSheetLayout.categoryDescriptionTv.text.toString().trim(),
+            categoryViewModel.categories.value?.size.orDefault()
         )
         addCategoryItemToDB(categoryModel)
     }
@@ -184,22 +186,24 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         binding.root.invalidate()
     }
 
-    private fun showAlertDialog(position:Int) {
+    private fun showAlertDialog(position: Int) {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.delete_category_Item_title))
             .setMessage(getString(R.string.delete_category_Item_content))
             .setCancelable(false)
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                val item = categoryViewModel.categories.value?.get(position)
-                item?.let {
-                    val item: CategoryModel = mAdapter.data[position]
-                    deleteCategoryItemFromDB(item)
-                }
-
+                deleteItemOnOkButtonClick(position)
             }
-            .setNegativeButton(getString(R.string.no)) { dialogInterface, int ->
+            .setNegativeButton(getString(R.string.no)) { _, _ ->
                 mAdapter.notifyDataSetChanged()
             }
             .show()
+    }
+
+    private fun deleteItemOnOkButtonClick(position: Int) {
+        val item = categoryViewModel.categories.value?.get(position)
+        item?.let {
+            deleteCategoryItemFromDB(it)
+        }
     }
 }
