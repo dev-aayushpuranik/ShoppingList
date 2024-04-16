@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/recycler_row_view_bg"
-    app:cardCornerRadius="10dp"
-    android:layout_margin="5dp">
+    android:layout_marginVertical="5dp"
+    app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
