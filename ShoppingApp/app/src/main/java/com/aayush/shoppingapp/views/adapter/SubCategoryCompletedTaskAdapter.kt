@@ -2,7 +2,6 @@ package com.aayush.shoppingapp.views.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -52,16 +51,6 @@ class SubCategoryCompletedTaskAdapter(
                 )
             )
 
-
-            val value = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                10F,
-                context.resources.displayMetrics
-            )
-            binding.cardView.radius = value
-            binding.cardView.preventCornerOverlap = true
-            binding.cardView.useCompatPadding = true
-
             setColorForViewAndText(context)
         }
 
@@ -72,26 +61,20 @@ class SubCategoryCompletedTaskAdapter(
         }
 
         private fun setColorForViewAndText(context: Context) {
-            binding.cardView.background =
-                ContextCompat.getDrawable(context, R.drawable.rounded_corners)
             binding.isCompletedIv.imageTintList =
-                ColorStateList.valueOf(ContextCompat.getColor(context, R.color.app_text_color))
+                ColorStateList.valueOf(getColor(context, R.color.app_text_color))
             binding.subCategoryTitleTv.setTextColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.app_text_color
-                )
+                getColor(context, R.color.app_text_color)
             )
             binding.subCategoryDescriptionTvTv.setTextColor(
-                ContextCompat.getColor(
-                    context,
-                    R.color.app_text_color
-                )
+                getColor(context, R.color.app_text_color)
             )
         }
+
+        private fun getColor(context: Context, color: Int): Int {
+            return ContextCompat.getColor(context, color)
+        }
     }
-
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SubCategoryCompletedTaskViewHolder {
         val binding = SubcategoryRowViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
