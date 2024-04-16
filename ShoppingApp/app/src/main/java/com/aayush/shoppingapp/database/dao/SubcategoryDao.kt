@@ -9,7 +9,7 @@ interface SubcategoryDao {
     fun insert(subcategoryTable: SubcategoryTable)
 
     @Insert
-    fun insertAll(list: List<SubcategoryTable>?)
+    fun insertAll(list: List<SubcategoryTable>)
 
     @Delete
     fun delete(subcategoryTable: SubcategoryTable)
