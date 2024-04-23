@@ -13,7 +13,6 @@ import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 class CategoriesViewModel : ViewModel() {
@@ -41,6 +40,12 @@ class CategoriesViewModel : ViewModel() {
         }, onError = {})
     }
 
+    suspend fun updateCategory(context: Context, categoryModel: CategoryModel) {
+        mRepo?.updateCategoryModel(context, categoryModel, onSuccess = {
+            getCategoriesFromDB(context)
+        }, onError = {})
+    }
+
     suspend fun deleteCategoryItemFromDB(context: Context, categoryModel: CategoryModel) {
         deleteAllSubCategoryForCategoryId(context, categoryModel)
         mRepo?.deleteCategoryItemFromDB(context, categoryModel, onSuccess = {
@@ -50,7 +55,7 @@ class CategoriesViewModel : ViewModel() {
         })
     }
 
-    suspend fun deleteAllSubCategoryForCategoryId(context: Context, categoryModel: CategoryModel) {
+    private suspend fun deleteAllSubCategoryForCategoryId(context: Context, categoryModel: CategoryModel) {
         mSubCategoryRepository?.getSubCategories(context, categoryModel.CategoryId) {
             val arrayList = arrayListOf<SubCategoryListModel>()
             arrayList.addAll(getSubCategories(it))
@@ -98,7 +103,7 @@ class CategoriesViewModel : ViewModel() {
                     arrayList.add(0, importantItem)
                 }
 
-                categories.value = arrayList
+                categories.value = arrayList.sortedByDescending { it.priorityId }
             }
         }
     }

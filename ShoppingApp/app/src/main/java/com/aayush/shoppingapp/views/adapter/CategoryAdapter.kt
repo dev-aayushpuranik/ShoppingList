@@ -2,6 +2,7 @@ package com.aayush.shoppingapp.views.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.util.LogPrinter
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -14,7 +15,8 @@ import com.aayush.shoppingapp.databinding.CategoryRowViewBinding
 import com.aayush.shoppingapp.models.CategoryModel
 
 class CategoryAdapter(
-    private val onItemClick:(CategoryModel) -> Unit
+    private val onItemClick:(CategoryModel) -> Unit,
+    private val onLongItemClicked:(CategoryModel) -> Unit
 ) : RecyclerView.Adapter<CategoryViewHolder>() {
 
     var data: List<CategoryModel> = ArrayList(0)
@@ -25,9 +27,11 @@ class CategoryAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, type: Int): CategoryViewHolder {
         val binding = CategoryRowViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return CategoryViewHolder(parent.context, binding) { index ->
+        return CategoryViewHolder(parent.context, binding, { index ->
             onItemClick(data[index])
-        }
+        }, { index ->
+            onLongItemClicked(data[index])
+        })
     }
 
     override fun onBindViewHolder(holder: CategoryViewHolder, position: Int) {
@@ -39,11 +43,15 @@ class CategoryAdapter(
     }
 }
 
-class CategoryViewHolder(private val context: Context, private val binding: CategoryRowViewBinding, onItemClick: (Int) -> Unit):
+class CategoryViewHolder(private val context: Context, private val binding: CategoryRowViewBinding, onItemClick: (Int) -> Unit, onLongItemClicked: (Int) -> Unit):
     RecyclerView.ViewHolder(binding.root) {
     init {
         itemView.setOnClickListener {
             onItemClick(adapterPosition)
+        }
+        itemView.setOnLongClickListener {
+            onLongItemClicked(adapterPosition)
+            true
         }
     }
 

@@ -141,7 +141,6 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
         val categoryDataObserver = Observer<List<SubCategoryListModel>> {
             CoroutineScope(Dispatchers.Main).launch {
                 binding.progressbar.SetViewVisible(false)
-                if(pendingTaskAdapter.data.isEmpty() && completedTaskAdapter.data.isEmpty()) { setBottomSheetStateExpand() } else setBottomSheetStateCollapse()
                 val completedItems = arrayListOf<SubCategoryListModel>()
                 val pendingItems = arrayListOf<SubCategoryListModel>()
                 binding.noTaskView.SetViewVisible(it.isEmpty())
@@ -157,6 +156,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                 binding.constraintLayout.SetViewVisible(completedItems.isNotEmpty())
                 completedTaskAdapter.data = completedItems
                 pendingTaskAdapter.data = pendingItems
+                if(pendingTaskAdapter.data.isEmpty() && completedTaskAdapter.data.isEmpty()) { setBottomSheetStateExpand() } else setBottomSheetStateCollapse()
             }
         }
         subCategoryViewModel?.subCategories?.observe(this.viewLifecycleOwner, categoryDataObserver)

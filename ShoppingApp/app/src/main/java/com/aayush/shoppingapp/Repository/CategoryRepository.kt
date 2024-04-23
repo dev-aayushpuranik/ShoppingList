@@ -61,6 +61,21 @@ class CategoryRepository {
         }
     }
 
+    suspend fun updateCategoryModel(
+        context: Context,
+        categoryModel: CategoryModel,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
+        try {
+            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
+            categoryDatabase.updateCategory(getCategoryTable(categoryModel))
+            onSuccess.invoke()
+        } catch (ex: java.lang.Exception) {
+            onError.invoke()
+        }
+    }
+
     suspend fun deleteCategoryItemFromDB(context: Context,
                                                 categoryModel: CategoryModel,
                                                 onSuccess: () -> Unit,

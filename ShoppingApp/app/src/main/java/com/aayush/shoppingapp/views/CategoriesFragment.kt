@@ -2,6 +2,7 @@ package com.aayush.shoppingapp.views
 
 import android.content.res.ColorStateList
 import android.os.Bundle
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +37,8 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
     private lateinit var categoryViewModel: CategoriesViewModel
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private lateinit var mAdapter: CategoryAdapter
+    private var mIsReorderingFlagTrue:Boolean = false
+    private var mEditableCategoryListModel: CategoryModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -54,7 +57,15 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
     }
 
     private fun setView() {
-        mAdapter = CategoryAdapter { navigateToSubTaskList(it) }
+        mAdapter = CategoryAdapter({ navigateToSubTaskList(it) },{
+            mEditableCategoryListModel = it
+            mIsReorderingFlagTrue=true
+            setBottomSheetStateExpand()
+            binding.bottomSheetLayout.addCategoryTitle.text =
+                "Edit Item ${mEditableCategoryListModel?.CategoryName.orDefault()}"
+            binding.bottomSheetLayout.categoryNameTV.text = Editable.Factory.getInstance().newEditable(it.CategoryName)
+            binding.bottomSheetLayout.categoryDescriptionTv.text = Editable.Factory.getInstance().newEditable( it.Description)
+        })
         binding.categoriesRV.adapter = mAdapter
         binding.categoriesRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         binding.progressbar.SetViewVisible(true)
@@ -100,8 +111,11 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
                 binding.bottomSheetLayout.categoryNameTV.clearFocus()
                 binding.bottomSheetLayout.categoryDescriptionTv.clearFocus()
 
-                addCategoryDataToDB()
-
+                if(mIsReorderingFlagTrue) {
+                    updateCategoryDataToDB()
+                } else {
+                    addCategoryDataToDB()
+                }
                 binding.bottomSheetLayout.categoryNameTV.text = null
                 binding.bottomSheetLayout.categoryDescriptionTv.text = null
             } else {
@@ -120,6 +134,21 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         }
     }
 
+    private fun updateCategoryDataToDB() {
+        val categoryModel = CategoryModel(
+             mEditableCategoryListModel?.CategoryId ?: Date().time,
+            binding.bottomSheetLayout.categoryNameTV.text.toString().trim(),
+            binding.bottomSheetLayout.categoryDescriptionTv.text.toString().trim(),
+            mEditableCategoryListModel?.priorityId ?: categoryViewModel.categories.value?.size.orDefault()
+        )
+        updateCategoryItemToDB(categoryModel)
+
+        mIsReorderingFlagTrue = false
+        mEditableCategoryListModel = null
+        setBottomSheetStateCollapse()
+        binding.bottomSheetLayout.addCategoryTitle.text = getString(R.string.add_new_Item)
+    }
+
     private fun addCategoryDataToDB() {
         val categoryModel = CategoryModel(
             Date().time,
@@ -128,6 +157,12 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
             categoryViewModel.categories.value?.size.orDefault()
         )
         addCategoryItemToDB(categoryModel)
+    }
+
+    private fun updateCategoryItemToDB(categoryModel: CategoryModel) {
+        CoroutineScope(Dispatchers.IO).launch {
+            categoryViewModel.updateCategory(requireContext(), categoryModel)
+        }
     }
 
     private fun addCategoryItemToDB(categoryModel: CategoryModel) {
@@ -205,5 +240,11 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         item?.let {
             deleteCategoryItemFromDB(it)
         }
+    }
+
+    override fun onDestroyView() {
+        mIsReorderingFlagTrue = false
+        mEditableCategoryListModel = null
+        super.onDestroyView()
     }
 }
