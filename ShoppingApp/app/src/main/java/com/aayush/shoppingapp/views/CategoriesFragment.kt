@@ -57,7 +57,8 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
     }
 
     private fun setView() {
-        mAdapter = CategoryAdapter({ navigateToSubTaskList(it) },{
+        mAdapter = CategoryAdapter({ navigateToSubTaskList(it) },
+            {
             mEditableCategoryListModel = it
             mIsReorderingFlagTrue=true
             setBottomSheetStateExpand()
@@ -92,7 +93,7 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
     }
 
     private fun setRowSwipeForRV() {
-        val sh = SwipeHelper(requireContext(), categoryViewModel.categories.value,
+        val sh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 showAlertDialog(viewHolder.adapterPosition)
             })

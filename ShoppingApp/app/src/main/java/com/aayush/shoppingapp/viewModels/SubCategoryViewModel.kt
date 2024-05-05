@@ -62,17 +62,16 @@ class SubCategoryViewModel: ViewModel() {
     }
 
     fun getSubCategoriesFromDB(requireContext: Context) {
-        if(mCategoryId == 0L) {
+        if (mCategoryId == 0L) {
             mRepo?.getAllSubCategoriesFromDB(requireContext) { it ->
-                val arrayList = arrayListOf<SubCategoryListModel>()
-                arrayList.clear()
-                arrayList.addAll(getSubCategories(it).sortedBy { it.priorityId })
-                arrayList.addAll(getSubCategories(it).filter { it.isImportant })
                 CoroutineScope(Dispatchers.Main).launch {
+                    val arrayList = arrayListOf<SubCategoryListModel>()
+                    arrayList.clear()
+                    val list = getSubCategories(it).filter { it.isImportant == true }
+                    arrayList.addAll(list)
                     subCategories.value = arrayList.toList()
                 }
             }
-
             return
         }
         CoroutineScope(Dispatchers.IO).launch {

@@ -8,12 +8,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.Callback
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
-import com.aayush.shoppingapp.models.CategoryModel
 
 
 class SwipeHelper(
     val context: Context,
-    val list: List<CategoryModel>?,
     val onDeleteSwipe: (viewHolder: RecyclerView.ViewHolder, direction: Int) -> Unit
 ) : Callback() {
 
@@ -54,7 +52,7 @@ class SwipeHelper(
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        if(isSwipeEnabled(viewHolder.adapterPosition)) {
+        if(isSwipeEnabled()) {
             val itemView = viewHolder.itemView
             val itemHeight = itemView.bottom - itemView.top
             val isCanceled = dX == 0f && !isCurrentlyActive
@@ -127,11 +125,7 @@ class SwipeHelper(
         onDeleteSwipe(viewHolder, direction)
     }
 
-    private fun isSwipeEnabled(position: Int): Boolean {
-        return if(list == null) {
-            true
-        } else {
-            (list.isNotEmpty() && list[0].CategoryId != 0L)
-        }
+    private fun isSwipeEnabled(): Boolean {
+        return true
     }
 }

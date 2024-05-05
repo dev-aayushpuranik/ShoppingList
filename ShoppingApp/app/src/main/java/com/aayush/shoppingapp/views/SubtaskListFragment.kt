@@ -91,7 +91,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
         binding.subtaskRV.adapter = pendingTaskAdapter
         binding.subtaskRV.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        val sh = SwipeHelper(requireContext(), null,
+        val sh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 val item: SubCategoryListModel = pendingTaskAdapter.data[viewHolder.adapterPosition]
                 deleteSubCategoryItemFromDB(item)
@@ -102,10 +102,6 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             })
         val pendingItemTouchHelper = ItemTouchHelper(sh)
         pendingItemTouchHelper.attachToRecyclerView(binding.subtaskRV)
-//        val callback: ItemTouchHelper.Callback = simpleCallback
-//        val touchHelper = ItemTouchHelper(callback)
-//        touchHelper.attachToRecyclerView(binding.subtaskRV)
-
         completedTaskAdapter = SubCategoryCompletedTaskAdapter(requireContext(), {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
         }, {
@@ -115,7 +111,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
         binding.completedSubtaskRV.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
-        val completedSh = SwipeHelper(requireContext(), null,
+        val completedSh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 val item: SubCategoryListModel = completedTaskAdapter.data[viewHolder.adapterPosition]
                 deleteSubCategoryItemFromDB(item)
@@ -125,10 +121,6 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                     completedTaskAdapter.notifyDataSetChanged()
                 }
             })
-//        val callback2: ItemTouchHelper.Callback = simpleCallback
-//        val touchHelper2 = ItemTouchHelper(callback2)
-//        touchHelper2.attachToRecyclerView(binding.completedSubtaskRV)
-
         val completedITH = ItemTouchHelper(completedSh)
         completedITH.attachToRecyclerView(binding.completedSubtaskRV)
 
@@ -279,26 +271,4 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
         super.onDestroyView()
         ((requireActivity() as MainActivity).registerBackPressEvent())
     }
-
-
-//    private var simpleCallback: ItemTouchHelper.SimpleCallback = object : ItemTouchHelper.SimpleCallback(
-//        ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.START or ItemTouchHelper.END,
-//        0
-//    ) {
-//        override fun onMove(
-//            recyclerView: RecyclerView,
-//            viewHolder: RecyclerView.ViewHolder,
-//            target: RecyclerView.ViewHolder
-//        ): Boolean {
-//            val fromPosition = viewHolder.adapterPosition
-//            val toPosition = target.adapterPosition
-//            Collections.swap(subCategoryViewModel?.subCategories?.value.orDefault(), fromPosition, toPosition)
-//            pendingTaskAdapter.notifyItemMoved(fromPosition, toPosition)
-//            completedTaskAdapter.notifyItemMoved(fromPosition, toPosition)
-//
-//            return false
-//        }
-//
-//        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-//    }
 }

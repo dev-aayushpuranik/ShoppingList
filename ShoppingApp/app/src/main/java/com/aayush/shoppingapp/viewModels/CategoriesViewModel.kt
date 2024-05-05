@@ -103,7 +103,7 @@ class CategoriesViewModel : ViewModel() {
                     arrayList.add(0, importantItem)
                 }
 
-                categories.value = arrayList.sortedByDescending { it.priorityId }
+                categories.value = arrayList
             }
         }
     }
