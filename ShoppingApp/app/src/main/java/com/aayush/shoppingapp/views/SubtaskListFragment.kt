@@ -89,8 +89,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
         })
         binding.subtaskRV.adapter = pendingTaskAdapter
-        binding.subtaskRV.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.subtaskRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         val sh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
                 val item: SubCategoryListModel = pendingTaskAdapter.data[viewHolder.adapterPosition]
@@ -108,8 +107,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
         })
         binding.completedSubtaskRV.adapter = completedTaskAdapter
-        binding.completedSubtaskRV.layoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.completedSubtaskRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
 
         val completedSh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
@@ -152,11 +150,14 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             }
         }
         subCategoryViewModel?.subCategories?.observe(this.viewLifecycleOwner, categoryDataObserver)
-        binding.bottomSheetLayout.isImportantCheckbox.visibility = View.VISIBLE
-        binding.bottomSheetLayout.addCategoryTitle.setOnClickListener {
-            setBottomSheetStateCollapseOrExpand()
+        binding.bottomSheetLayout.root.SetViewVisible(isBottomSheetVisible())
+        binding.addSubTaskFAB.SetViewVisible(isBottomSheetVisible())
+        if(isBottomSheetVisible()) {
+            binding.bottomSheetLayout.isImportantCheckbox.visibility = View.VISIBLE
+            binding.bottomSheetLayout.addCategoryTitle.setOnClickListener {
+                setBottomSheetStateCollapseOrExpand()
+            }
         }
-
         binding.constraintLayout.setOnClickListener {
             if(binding.completedSubtaskRV.height != 0) {subCategoryViewModel?.completedTaskHeight = binding.completedSubtaskRV.height}
             if(binding.completedSubtaskRV.height != 0) {
@@ -260,14 +261,44 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
     }
 
     private fun applyDayNightMode() {
-        binding.bottomSheetLayout.addCategoryTitle.background = ContextCompat.getDrawable(requireContext(), R.color.headerColor)
-        binding.bottomSheetLayout.addCategoryTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
-        binding.bottomSheetLayout.addCategoryView.background = ContextCompat.getDrawable(requireContext(), R.color.recycler_row_view_bg)
-        binding.bottomSheetLayout.categoryNameTV.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
-        binding.bottomSheetLayout.categoryDescriptionTv.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
-        binding.bottomSheetLayout.categoryNameTV.setHintTextColor(ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.toolbarColor)))
-        binding.bottomSheetLayout.subTaskNameInputLayout.hintTextColor = ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.toolbarColor))
+        if(isBottomSheetVisible()) {
+            binding.bottomSheetLayout.addCategoryTitle.background =
+                ContextCompat.getDrawable(requireContext(), R.color.headerColor)
+            binding.bottomSheetLayout.addCategoryTitle.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.app_text_color
+                )
+            )
+            binding.bottomSheetLayout.addCategoryView.background =
+                ContextCompat.getDrawable(requireContext(), R.color.recycler_row_view_bg)
+            binding.bottomSheetLayout.categoryNameTV.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.app_text_color
+                )
+            )
+            binding.bottomSheetLayout.categoryDescriptionTv.setTextColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.app_text_color
+                )
+            )
+            binding.bottomSheetLayout.categoryNameTV.setHintTextColor(
+                ColorStateList.valueOf(
+                    ContextCompat.getColor(requireContext(), R.color.toolbarColor)
+                )
+            )
+            binding.bottomSheetLayout.subTaskNameInputLayout.hintTextColor = ColorStateList.valueOf(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.toolbarColor
+                )
+            )
+        }
     }
+
+    private fun isBottomSheetVisible():Boolean = (categoryModel?.CategoryId != 0L)
 
     override fun onDestroyView() {
         super.onDestroyView()

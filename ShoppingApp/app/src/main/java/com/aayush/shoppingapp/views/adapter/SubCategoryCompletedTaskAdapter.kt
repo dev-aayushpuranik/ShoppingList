@@ -62,7 +62,7 @@ class SubCategoryCompletedTaskAdapter(
 
         private fun setColorForViewAndText(context: Context) {
             binding.isCompletedIv.imageTintList =
-                ColorStateList.valueOf(getColor(context, R.color.app_text_color))
+                ColorStateList.valueOf(getColor(context, R.color.impotant_color))
             binding.subCategoryTitleTv.setTextColor(
                 getColor(context, R.color.app_text_color)
             )

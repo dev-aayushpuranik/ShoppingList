@@ -63,7 +63,7 @@ class SubCategoryAdapter(
             binding.subCategoryDescriptionTvTv.SetViewVisible(subCategoryModel.subtaskDescription.isNotEmpty())
         }
         private fun setColorForViewAndText(context: Context) {
-            binding.isCompletedIv.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.app_text_color))
+            binding.isCompletedIv.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.impotant_color))
             binding.subCategoryTitleTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
             binding.subCategoryDescriptionTvTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
         }

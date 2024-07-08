@@ -49,6 +49,7 @@
         android:paddingStart="5dp"
         android:text="@string/important_ques"
         android:visibility="visible"
+        android:drawableTint="@color/toolbarColor"
         app:layout_constraintBottom_toBottomOf="@+id/saveTaskBtn"
         app:layout_constraintEnd_toStartOf="@+id/saveTaskBtn"
         app:layout_constraintHorizontal_bias="0.5"
