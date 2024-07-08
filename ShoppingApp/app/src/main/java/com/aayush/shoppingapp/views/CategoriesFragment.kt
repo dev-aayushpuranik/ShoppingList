@@ -59,17 +59,23 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
     private fun setView() {
         mAdapter = CategoryAdapter({ navigateToSubTaskList(it) },
             {
-            mEditableCategoryListModel = it
-            mIsReorderingFlagTrue=true
-            setBottomSheetStateExpand()
-            binding.bottomSheetLayout.addCategoryTitle.text =
-                "Edit Item ${mEditableCategoryListModel?.CategoryName.orDefault()}"
-            binding.bottomSheetLayout.categoryNameTV.text = Editable.Factory.getInstance().newEditable(it.CategoryName)
-            binding.bottomSheetLayout.categoryDescriptionTv.text = Editable.Factory.getInstance().newEditable( it.Description)
-        })
+                mEditableCategoryListModel = it
+                mIsReorderingFlagTrue = true
+                setBottomSheetStateExpand()
+                binding.bottomSheetLayout.addCategoryTitle.text =
+                    "Edit Item ${mEditableCategoryListModel?.CategoryName.orDefault()}"
+                binding.bottomSheetLayout.categoryNameTV.text =
+                    Editable.Factory.getInstance().newEditable(it.CategoryName)
+                binding.bottomSheetLayout.categoryDescriptionTv.text =
+                    Editable.Factory.getInstance().newEditable(it.Description)
+
+
+            })
         binding.categoriesRV.adapter = mAdapter
-        binding.categoriesRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.categoriesRV.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         binding.progressbar.SetViewVisible(true)
+        binding.bottomSheetLayout.isImportantCheckbox.visibility = View.GONE
         binding.addSubTaskFAB.setOnClickListener {
             setBottomSheetStateExpand()
         }

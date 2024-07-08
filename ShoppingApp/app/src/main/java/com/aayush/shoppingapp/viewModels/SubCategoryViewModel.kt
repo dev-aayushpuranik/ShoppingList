@@ -26,6 +26,9 @@ class SubCategoryViewModel: ViewModel() {
 
     fun addNewSubCategoryItem(context: Context, subtaskListModel: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
+            if(subtaskListModel.categoryId == 0L) {
+                subtaskListModel.isImportant = true
+            }
             mRepo?.addNewSubCategoryItem(context, subtaskListModel, onSuccess = {
                 getSubCategoriesFromDB(requireContext = context)
             }, onError = {})
@@ -67,7 +70,7 @@ class SubCategoryViewModel: ViewModel() {
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     arrayList.clear()
-                    val list = getSubCategories(it).filter { it.isImportant == true }
+                    val list = getSubCategories(it).filter { it.isImportant || it.categoryId == 0L }
                     arrayList.addAll(list)
                     subCategories.value = arrayList.toList()
                 }

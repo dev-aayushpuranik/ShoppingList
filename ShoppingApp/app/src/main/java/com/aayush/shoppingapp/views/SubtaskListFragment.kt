@@ -152,7 +152,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             }
         }
         subCategoryViewModel?.subCategories?.observe(this.viewLifecycleOwner, categoryDataObserver)
-
+        binding.bottomSheetLayout.isImportantCheckbox.visibility = View.VISIBLE
         binding.bottomSheetLayout.addCategoryTitle.setOnClickListener {
             setBottomSheetStateCollapseOrExpand()
         }
@@ -200,6 +200,8 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
 
                 binding.bottomSheetLayout.categoryNameTV.text = null
                 binding.bottomSheetLayout.categoryDescriptionTv.text = null
+                binding.bottomSheetLayout.isImportantCheckbox.visibility = View.VISIBLE
+                binding.bottomSheetLayout.isImportantCheckbox.isChecked = false
             } else {
                 UIHelper.toast(requireContext(), getString(R.string.task_name_cannot_be_empty))
             }
@@ -214,7 +216,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                 subtaskName = binding.bottomSheetLayout.categoryNameTV.text.toString(),
                 subtaskDescription = binding.bottomSheetLayout.categoryDescriptionTv.text.toString(),
                 isTaskDone = false,
-                isImportant = false,
+                isImportant = binding.bottomSheetLayout.isImportantCheckbox.isChecked,
                 priorityId = subCategoryViewModel?.subCategories?.value?.size.orDefault()
             )
             if (!binding.bottomSheetLayout.categoryNameTV.text?.trim().isNullOrEmpty()) {
