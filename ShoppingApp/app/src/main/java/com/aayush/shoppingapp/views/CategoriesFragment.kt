@@ -99,7 +99,12 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
     private fun setRowSwipeForRV() {
         val sh = SwipeHelper(requireContext(),
             onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
-                showAlertDialog(viewHolder.adapterPosition)
+                if (categoryViewModel.categories.value?.isNotEmpty() ?: false
+                    && (categoryViewModel.categories.value?.get(viewHolder.adapterPosition)?.CategoryId != 0L)) {
+                    showDeleteAlertDialog(viewHolder.adapterPosition)
+                } else {
+                    showAlertDialog("Unable to Delete", "This is not a deletable item because it just showes the list of important items and it is added only if there are any important items marked")
+                }
             })
 
         val itemTouchHelper = ItemTouchHelper(sh)
@@ -226,7 +231,7 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         binding.root.invalidate()
     }
 
-    private fun showAlertDialog(position: Int) {
+    private fun showDeleteAlertDialog(position: Int) {
         AlertDialog.Builder(requireContext())
             .setTitle(getString(R.string.delete_category_Item_title))
             .setMessage(getString(R.string.delete_category_Item_content))
@@ -236,6 +241,18 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
             }
             .setNegativeButton(getString(R.string.no)) { _, _ ->
                 mAdapter.notifyDataSetChanged()
+            }
+            .show()
+    }
+
+    private fun showAlertDialog(title:String, body: String) {
+        AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage(body)
+            .setCancelable(false)
+            .setNegativeButton(getString(R.string.ok)) { listener , _ ->
+                mAdapter.notifyDataSetChanged()
+                listener.dismiss()
             }
             .show()
     }

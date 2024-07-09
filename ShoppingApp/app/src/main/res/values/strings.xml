@@ -23,4 +23,5 @@
     <string name="task_name_cannot_be_empty">Task Name cannot be empty</string>
     <string name="no_task_added">No task or subtask added. Please add some tasks and subtasks</string>
     <string name="no_subtask_added">No subtask added. Please add some subtasks</string>
+    <string name="ok">Ok</string>
 </resources>
