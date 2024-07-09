@@ -96,4 +96,16 @@ class SubCategoryAdapter(
     override fun getItemCount(): Int {
         return data.size.orDefault()
     }
+
+    fun moveItem(from: Int, to: Int) {
+        val fromItem = data[from]
+        val toItem = data[to]
+        val items = data as ArrayList
+        items.removeAt(from)
+        if (to < from) {
+            items.add(to, fromItem)
+        } else {
+            items.add(to - 1, fromItem)
+        }
+    }
 }

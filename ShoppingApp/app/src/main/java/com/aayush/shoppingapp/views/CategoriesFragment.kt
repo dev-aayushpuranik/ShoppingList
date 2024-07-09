@@ -1,6 +1,7 @@
 package com.aayush.shoppingapp.views
 
 import android.content.res.ColorStateList
+import android.icu.lang.UProperty
 import android.os.Bundle
 import android.text.Editable
 import android.view.LayoutInflater
@@ -13,8 +14,16 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
+import androidx.recyclerview.widget.ItemTouchHelper.DOWN
+import androidx.recyclerview.widget.ItemTouchHelper.END
+import androidx.recyclerview.widget.ItemTouchHelper.START
+import androidx.recyclerview.widget.ItemTouchHelper.UP
+import androidx.recyclerview.widget.ItemTouchUIUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.FOCUS_UP
+import androidx.recyclerview.widget.RecyclerView.SimpleOnItemTouchListener
 import com.aayush.shoppingapp.OnDayNightStateChanged
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
@@ -72,6 +81,7 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         binding.categoriesRV.adapter = mAdapter
         binding.categoriesRV.layoutManager =
             LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        addReorderLogicToRecyclerView()
         binding.progressbar.SetViewVisible(true)
         binding.bottomSheetLayout.isImportantCheckbox.visibility = View.GONE
         binding.addSubTaskFAB.setOnClickListener {
@@ -108,6 +118,66 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
             })
 
         val itemTouchHelper = ItemTouchHelper(sh)
+        itemTouchHelper.attachToRecyclerView(binding.categoriesRV)
+    }
+
+    private fun addReorderLogicToRecyclerView() {
+        val itemTouchHelper by lazy {
+            // 1. Note that I am specifying all 4 directions.
+            //    Specifying START and END also allows
+            //    more organic dragging than just specifying UP and DOWN.
+            val simpleItemTouchCallback =
+                object : ItemTouchHelper.SimpleCallback(UP or
+                        DOWN, 0) {
+
+                    // 1. This callback is called when a ViewHolder is selected.
+                    //    We highlight the ViewHolder here.
+                    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?,
+                                                   actionState: Int) {
+                        super.onSelectedChanged(viewHolder, actionState)
+
+                        if (actionState == ACTION_STATE_DRAG) {
+                            viewHolder?.itemView?.alpha = 0.5f
+                        }
+                    }
+                    // 2. This callback is called when the ViewHolder is
+                    //    unselected (dropped). We unhighlight the ViewHolder here.
+                    override fun clearView(recyclerView: RecyclerView,
+                                           viewHolder: RecyclerView.ViewHolder) {
+                        super.clearView(recyclerView, viewHolder)
+                        viewHolder?.itemView?.alpha = 1.0f
+                    }
+
+                    override fun onMove(recyclerView: RecyclerView,
+                                        viewHolder: RecyclerView.ViewHolder,
+                                        target: RecyclerView.ViewHolder): Boolean {
+
+                        val adapter = recyclerView.adapter as CategoryAdapter
+                        val from = viewHolder.adapterPosition
+                        val to = target.adapterPosition
+                        // 2. Update the backing model. Custom implementation in
+                        //    MainRecyclerViewAdapter. You need to implement
+                        //    reordering of the backing model inside the method.
+                        val fromItem = categoryViewModel.categories.value?.get(from)
+                        val toItem = categoryViewModel.categories.value?.get(to)
+                        if(fromItem?.CategoryId != 0L && toItem?.CategoryId != 0L) {
+                            adapter.moveItem(from, to)
+                            // 3. Tell adapter to render the model update.
+                            adapter.notifyItemMoved(from, to)
+
+                            return true
+                        } else return false
+                    }
+                    override fun onSwiped(viewHolder: RecyclerView.ViewHolder,
+                                          direction: Int) {
+                        // 4. Code block for horizontal swipe.
+                        //    ItemTouchHelper handles horizontal swipe as well, but
+                        //    it is not relevant with reordering. Ignoring here.
+                    }
+                }
+            ItemTouchHelper(simpleItemTouchCallback)
+        }
+
         itemTouchHelper.attachToRecyclerView(binding.categoriesRV)
     }
 
