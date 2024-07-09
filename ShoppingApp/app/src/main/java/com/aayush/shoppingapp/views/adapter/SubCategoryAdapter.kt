@@ -63,9 +63,11 @@ class SubCategoryAdapter(
             binding.subCategoryDescriptionTvTv.SetViewVisible(subCategoryModel.subtaskDescription.isNotEmpty())
         }
         private fun setColorForViewAndText(context: Context) {
-            binding.isCompletedIv.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.impotant_color))
+            binding.isCompletedIv.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.app_text_color))
             binding.subCategoryTitleTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
             binding.subCategoryDescriptionTvTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
+            binding.cardView.background = ContextCompat.getDrawable(context, R.drawable.rounded_corners)
+            binding.separate.background = ContextCompat.getDrawable(context, R.color.headerColor)
         }
     }
 
@@ -84,7 +86,6 @@ class SubCategoryAdapter(
     }
 
     private fun onImportantItemClicked(item: SubCategoryListModel) {
-        item.isImportant = !item.isImportant
         onImportantItemClick(item)
     }
 

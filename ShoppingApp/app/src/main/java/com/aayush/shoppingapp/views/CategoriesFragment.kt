@@ -45,10 +45,8 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentCategoriesBinding.inflate(inflater, container, false)
-
         categoryViewModel =
             ViewModelProvider(requireActivity())[CategoriesViewModel::class.java]
-
         setView()
         loadData()
         setAddCategoryView()

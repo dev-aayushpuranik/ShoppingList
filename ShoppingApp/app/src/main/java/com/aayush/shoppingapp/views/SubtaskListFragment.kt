@@ -1,6 +1,5 @@
 package com.aayush.shoppingapp.views
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -30,7 +29,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.Collections
 import java.util.Date
 
 
@@ -82,7 +80,10 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
             navigateToPreviousScreen()
         }
         pendingTaskAdapter = SubCategoryAdapter(requireContext(), {
-            subCategoryViewModel?.updateCategoryItem(requireContext(), it)
+            if (categoryModel?.CategoryId != 0L) {
+                it.isImportant = !it.isImportant
+                subCategoryViewModel?.updateCategoryItem(requireContext(), it)
+            }
         }, {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
         }, {
@@ -102,7 +103,10 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
         val pendingItemTouchHelper = ItemTouchHelper(sh)
         pendingItemTouchHelper.attachToRecyclerView(binding.subtaskRV)
         completedTaskAdapter = SubCategoryCompletedTaskAdapter(requireContext(), {
-            subCategoryViewModel?.updateCategoryItem(requireContext(), it)
+            if (categoryModel?.CategoryId != 0L) {
+                it.isImportant = !it.isImportant
+                subCategoryViewModel?.updateCategoryItem(requireContext(), it)
+            }
         }, {
             subCategoryViewModel?.updateCategoryItem(requireContext(), it)
         })
@@ -262,39 +266,18 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
 
     private fun applyDayNightMode() {
         if(isBottomSheetVisible()) {
-            binding.bottomSheetLayout.addCategoryTitle.background =
-                ContextCompat.getDrawable(requireContext(), R.color.headerColor)
-            binding.bottomSheetLayout.addCategoryTitle.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.app_text_color
-                )
-            )
-            binding.bottomSheetLayout.addCategoryView.background =
-                ContextCompat.getDrawable(requireContext(), R.color.recycler_row_view_bg)
-            binding.bottomSheetLayout.categoryNameTV.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.app_text_color
-                )
-            )
-            binding.bottomSheetLayout.categoryDescriptionTv.setTextColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.app_text_color
-                )
-            )
-            binding.bottomSheetLayout.categoryNameTV.setHintTextColor(
-                ColorStateList.valueOf(
-                    ContextCompat.getColor(requireContext(), R.color.toolbarColor)
-                )
-            )
-            binding.bottomSheetLayout.subTaskNameInputLayout.hintTextColor = ColorStateList.valueOf(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.toolbarColor
-                )
-            )
+            binding.bottomSheetLayout.addCategoryTitle.background = ContextCompat.getDrawable(requireContext(), R.color.headerColor)
+            binding.bottomSheetLayout.addCategoryTitle.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
+            binding.bottomSheetLayout.addCategoryView.background = ContextCompat.getDrawable(requireContext(), R.color.recycler_row_view_bg)
+
+            binding.bottomSheetLayout.categoryNameTV.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
+            binding.bottomSheetLayout.categoryDescriptionTv.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
+
+            binding.bottomSheetLayout.isImportantCheckbox.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
+            binding.completedListHeader.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
+
+            binding.root.invalidate()
+            binding.root.requestLayout()
         }
     }
 

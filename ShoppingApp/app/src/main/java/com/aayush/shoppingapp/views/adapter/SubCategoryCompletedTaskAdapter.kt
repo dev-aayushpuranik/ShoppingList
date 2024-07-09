@@ -62,7 +62,7 @@ class SubCategoryCompletedTaskAdapter(
 
         private fun setColorForViewAndText(context: Context) {
             binding.isCompletedIv.imageTintList =
-                ColorStateList.valueOf(getColor(context, R.color.impotant_color))
+                ColorStateList.valueOf(getColor(context, R.color.app_text_color))
             binding.subCategoryTitleTv.setTextColor(
                 getColor(context, R.color.app_text_color)
             )
@@ -94,7 +94,6 @@ class SubCategoryCompletedTaskAdapter(
     }
 
     private fun onImportantItemClicked(item: SubCategoryListModel) {
-        item.isImportant = !item.isImportant
         onImportantItemClick(item)
     }
 
