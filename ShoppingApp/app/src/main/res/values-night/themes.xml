@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="BottomSheetTextStyle" parent="Theme.MaterialComponents.DayNight">
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="maxLines">3</item>
+        <item name="android:singleLine">false</item>
+        <item name="android:inputType">text|textMultiLine</item>
+        <item name="android:textColor">@color/app_text_color</item>
+        <item name="hintTextColor">@color/app_text_color</item>
+        <item name="android:textColorHint">@color/app_text_color</item>
+        <item name="hintEnabled">true</item>
+    </style>
+</resources>

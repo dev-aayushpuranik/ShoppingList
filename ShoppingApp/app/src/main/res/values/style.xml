@@ -7,16 +7,17 @@
         <item name="android:windowBackground">@color/recyclerViewBG</item>
     </style>
 
-    <style name="BottomSheetTextStyle">
-        <item name="android:textStyle">normal</item>
-        <item name="android:textSize">14sp</item>
-        <item name="maxLines">3</item>
-        <item name="android:singleLine">false</item>
-        <item name="android:inputType">text|textMultiLine</item>
-        <item name="android:textColor">@color/app_text_color</item>
-        <item name="hintTextColor">@color/app_text_color</item>
-        <item name="hintEnabled">true</item>
-    </style>
+<!--    <style name="BottomSheetTextStyle" parent="Theme.Design.BottomSheetDialog">-->
+<!--        <item name="android:textStyle">normal</item>-->
+<!--        <item name="android:textSize">14sp</item>-->
+<!--        <item name="maxLines">3</item>-->
+<!--        <item name="android:singleLine">false</item>-->
+<!--        <item name="android:inputType">text|textMultiLine</item>-->
+<!--        <item name="android:textColor">@color/app_text_color</item>-->
+<!--        <item name="hintTextColor">@color/app_text_color</item>-->
+<!--        <item name="hintEnabled">true</item>-->
+<!--    </style>
+-->
 
     <style name="HeaderTextStyle">
         <item name="android:textColor">@color/app_text_color</item>
@@ -49,7 +50,7 @@
         <item name="colorOnSecondary">@color/toolbarColor</item>
     </style>
 
-    <style name="ThemeOverlay.YourApp.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog">
+    <style name="ThemeOverlay.YourApp.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.Dialog.Alert">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:windowAnimationStyle">@style/Animation.MaterialComponents.BottomSheetDialog</item>
         <item name="bottomSheetStyle">@style/Widget.MaterialComponents.BottomSheet.Modal</item>
