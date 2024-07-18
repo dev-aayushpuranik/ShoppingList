@@ -2,6 +2,7 @@ package com.aayush.shoppingapp.views.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.ColorFilter
 import android.util.LogPrinter
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.databinding.CategoryRowViewBinding
@@ -75,6 +77,14 @@ class CategoryViewHolder(private val context: Context, private val binding: Cate
             binding.imageView2.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.ic_baseline_format_list_bulleted_24))
             binding.imageView2.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.app_text_color))
         }
+        if(model.priorityId == PRIORITY.HIGH) {
+            binding.priorityIcon.setColorFilter(context.getColor(android.R.color.holo_red_light))
+        } else if (model.priorityId == PRIORITY.MEDIUM) {
+            binding.priorityIcon.setColorFilter(context.getColor(android.R.color.holo_orange_light))
+        } else if(model.priorityId == PRIORITY.LOW) {
+            binding.priorityIcon.setColorFilter(context.getColor(android.R.color.holo_blue_dark))
+        }
+        binding.priorityIcon.setImageResource(R.drawable.priority_high_icon)
         binding.categoryNameTV.text = model.CategoryName
         binding.DiscriptionNameTV.text = model.Description
         binding.DiscriptionNameTV.SetViewVisible(model.Description.isNotEmpty())

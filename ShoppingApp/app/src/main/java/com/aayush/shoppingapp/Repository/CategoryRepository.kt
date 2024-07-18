@@ -98,6 +98,6 @@ class CategoryRepository {
     }
 
     private fun getCategoryTable(categoryModel: CategoryModel) : CategoryTable {
-        return CategoryTable(categoryModel.CategoryId,categoryModel.CategoryName,categoryModel.Description, categoryModel.priorityId)
+        return CategoryTable(categoryModel.CategoryId,categoryModel.CategoryName,categoryModel.Description, categoryModel.priorityId.value)
     }
 }

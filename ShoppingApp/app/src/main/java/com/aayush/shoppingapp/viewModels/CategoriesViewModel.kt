@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.Repository.CategoryRepository
 import com.aayush.shoppingapp.Repository.SubCategoryRepository
+import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
@@ -85,9 +86,13 @@ class CategoriesViewModel : ViewModel() {
     private fun getSubCategory(table: SubcategoryTable?): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
         table?.let {
-            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, it.priorityId)
+            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, getSelectedPriorityForTask(it.priorityId))
         }
         return model
+    }
+
+    private fun getSelectedPriorityForTask(priorityIndex:Int): PRIORITY {
+        return if (priorityIndex == PRIORITY.HIGH.value) PRIORITY.HIGH else if (priorityIndex == PRIORITY.MEDIUM.value) PRIORITY.MEDIUM else PRIORITY.LOW
     }
 
     fun getCategoriesFromDB(context: Context) {
@@ -97,9 +102,10 @@ class CategoriesViewModel : ViewModel() {
             CoroutineScope(Dispatchers.Main).launch {
                 val arrayList = arrayListOf<CategoryModel>()
                 arrayList.addAll(getCategories(it))
+                arrayList.sortBy { it.priorityId }
 
                 if((subCategories.filter { it.isImportant }).isNotEmpty()) {
-                    val importantItem = CategoryModel(0, getString(context, R.string.important), "", 0)
+                    val importantItem = CategoryModel(0, getString(context, R.string.important), "", PRIORITY.HIGH)
                     arrayList.add(0, importantItem)
                 }
 
@@ -117,11 +123,17 @@ class CategoriesViewModel : ViewModel() {
     private fun getCategory(table: CategoryTable?): CategoryModel? {
         var model: CategoryModel? = null
         table?.let {
+            val priority = when(it.priorityId) {
+                PRIORITY.HIGH.value -> PRIORITY.HIGH
+                PRIORITY.MEDIUM.value -> PRIORITY.MEDIUM
+                PRIORITY.LOW.value -> PRIORITY.LOW
+                else -> { PRIORITY.LOW}
+            }
             model = CategoryModel(
                 it.id,
                 it.CategoryTitle,
                 it.CategoryDescription,
-                it.priorityId
+                priority
             )
         }
         return model
