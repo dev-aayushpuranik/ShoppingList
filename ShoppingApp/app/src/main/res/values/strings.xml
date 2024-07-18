@@ -24,4 +24,10 @@
     <string name="no_task_added">No task or subtask added. Please add some tasks and subtasks</string>
     <string name="no_subtask_added">No subtask added. Please add some subtasks</string>
     <string name="ok">Ok</string>
+
+    <string-array name="priority_level">
+        <item>High</item>
+        <item>Medium</item>
+        <item>Low</item>
+    </string-array>
 </resources>
