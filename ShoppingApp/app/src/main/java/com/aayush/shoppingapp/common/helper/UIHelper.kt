@@ -5,7 +5,8 @@ import android.content.Context
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
-import com.google.android.material.snackbar.BaseTransientBottomBar
+import androidx.appcompat.app.AlertDialog
+import com.aayush.shoppingapp.R
 import com.google.android.material.snackbar.Snackbar
 
 class UIHelper {
@@ -48,6 +49,31 @@ class UIHelper {
             valueAnimator.interpolator = DecelerateInterpolator()
             valueAnimator.duration = duration.toLong()
             valueAnimator.start()
+        }
+
+        public fun showAlertDialog(context: Context, title:String, body: String, okButtonCLicked:()->Unit) {
+            AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(body)
+                .setCancelable(false)
+                .setNegativeButton(context.getString(R.string.ok)) { listener, _ ->
+                    listener.dismiss()
+                }
+                .show()
+        }
+
+        public fun showDeleteAlertDialog(context: Context, yesButtonClick:()->Unit, onNoButtonClick:()->Unit) {
+            AlertDialog.Builder(context)
+                .setTitle(context.getString(R.string.delete_category_Item_title))
+                .setMessage(context.getString(R.string.delete_category_Item_content))
+                .setCancelable(false)
+                .setPositiveButton(context.getString(R.string.yes)) { _, _ ->
+                    yesButtonClick()
+                }
+                .setNegativeButton(context.getString(R.string.no)) { _, _ ->
+                    onNoButtonClick()
+                }
+                .show()
         }
     }
 }

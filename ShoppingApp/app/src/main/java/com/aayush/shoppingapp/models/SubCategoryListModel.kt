@@ -1,5 +1,7 @@
 package com.aayush.shoppingapp.models
 
+import com.aayush.shoppingapp.common.Enums.PRIORITY
+
 data class SubCategoryListModel(
     val subtaskItemId: Long,
     val categoryId: Long,
@@ -7,5 +9,5 @@ data class SubCategoryListModel(
     val subtaskDescription: String,
     var isTaskDone: Boolean,
     var isImportant: Boolean,
-    val priorityId: Int
+    val priorityId: PRIORITY
 )

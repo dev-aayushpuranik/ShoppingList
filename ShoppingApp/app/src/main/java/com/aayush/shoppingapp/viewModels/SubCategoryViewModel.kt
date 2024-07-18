@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.aayush.shoppingapp.Repository.SubCategoryRepository
+import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import kotlinx.coroutines.CoroutineScope
@@ -99,15 +100,19 @@ class SubCategoryViewModel: ViewModel() {
         tables?.forEach {
             getSubCategory(it)?.let { it1 -> arrayList.add(it1) }
         }
-        return arrayList.toList()
+        return arrayList.toList().sortedBy { it.priorityId }
     }
 
     private fun getSubCategory(table: SubcategoryTable?): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
         table?.let {
-            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, it.priorityId)
+            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, getSelectedPriorityForTask(it.priorityId))
         }
         return model
+    }
+
+    private fun getSelectedPriorityForTask(priorityIndex:Int): PRIORITY {
+        return if (priorityIndex == PRIORITY.HIGH.value) PRIORITY.HIGH else if (priorityIndex == PRIORITY.MEDIUM.value) PRIORITY.MEDIUM else PRIORITY.LOW
     }
 
     private fun getSubCategoryTableItem(table: SubCategoryListModel?): SubcategoryTable? {
@@ -116,7 +121,7 @@ class SubCategoryViewModel: ViewModel() {
             model = SubcategoryTable(
                 it.subtaskItemId, it.categoryId,
                 it.subtaskName, it.subtaskDescription,
-                it.isTaskDone, it.isImportant, it.priorityId)
+                it.isTaskDone, it.isImportant, it.priorityId.value)
         }
         return model
     }

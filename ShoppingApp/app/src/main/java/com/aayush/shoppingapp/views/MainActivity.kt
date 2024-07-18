@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
             .setMessage(getString(R.string.are_you_sure_you_want_to_exit))
             .setCancelable(false)
             .setPositiveButton(getString(R.string.yes)) { _, _ ->
-                finishAndRemoveTask()
+                finish()
             }
             .setNegativeButton(getString(R.string.no), null)
             .show()

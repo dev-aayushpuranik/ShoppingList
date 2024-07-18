@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.OnDayNightStateChanged
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.common.helper.UIHelper
@@ -23,7 +25,6 @@ import com.aayush.shoppingapp.databinding.FragmentSubtaskListBinding
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import com.aayush.shoppingapp.viewModels.SubCategoryViewModel
-import com.aayush.shoppingapp.views.adapter.CategoryAdapter
 import com.aayush.shoppingapp.views.adapter.SubCategoryAdapter
 import com.aayush.shoppingapp.views.adapter.SubCategoryCompletedTaskAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -178,6 +179,15 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                 UIHelper.expand(binding.completedSubtaskRV, 500, subCategoryViewModel?.completedTaskHeight ?: 200)
             }
         }
+
+        // priority spinner
+        val arrayAdapter = ArrayAdapter.createFromResource(
+            requireContext(),
+            R.array.priority_level,
+            android.R.layout.simple_list_item_1
+        )
+        binding.bottomSheetLayout.prioritySelector.adapter = arrayAdapter
+        binding.bottomSheetLayout.prioritySelector.setSelection(PRIORITY.LOW.value - 1)
     }
     private fun addReorderLogicToRecyclerView() {
         val itemTouchHelper by lazy {
@@ -336,10 +346,16 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                 binding.bottomSheetLayout.categoryDescriptionTv.text = null
                 binding.bottomSheetLayout.isImportantCheckbox.visibility = View.VISIBLE
                 binding.bottomSheetLayout.isImportantCheckbox.isChecked = false
+                binding.bottomSheetLayout.prioritySelector.setSelection(PRIORITY.LOW.value-1)
             } else {
                 UIHelper.toast(requireContext(), getString(R.string.task_name_cannot_be_empty))
             }
         }
+    }
+
+    private fun getSelectedPriorityForTask(): PRIORITY {
+        val priorityIndex = binding.bottomSheetLayout.prioritySelector.selectedItemPosition
+        return if (priorityIndex + 1 == PRIORITY.HIGH.value) PRIORITY.HIGH else if (priorityIndex + 1 == PRIORITY.MEDIUM.value) PRIORITY.MEDIUM else PRIORITY.LOW
     }
 
     private fun addSubCategoryItemToDB() {
@@ -351,7 +367,7 @@ class SubtaskListFragment() : Fragment(), OnDayNightStateChanged {
                 subtaskDescription = binding.bottomSheetLayout.categoryDescriptionTv.text.toString(),
                 isTaskDone = false,
                 isImportant = binding.bottomSheetLayout.isImportantCheckbox.isChecked,
-                priorityId = subCategoryViewModel?.subCategories?.value?.size.orDefault()
+                priorityId = getSelectedPriorityForTask()
             )
             if (!binding.bottomSheetLayout.categoryNameTV.text?.trim().isNullOrEmpty()) {
                 addSubCategoryItemToDB(item)

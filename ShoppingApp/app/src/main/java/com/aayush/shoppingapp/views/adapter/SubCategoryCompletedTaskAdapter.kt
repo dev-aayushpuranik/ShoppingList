@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.databinding.SubcategoryRowViewBinding
@@ -50,7 +51,14 @@ class SubCategoryCompletedTaskAdapter(
                     importantIcon
                 )
             )
-
+            binding.isPriorityIv.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.priority_high_icon))
+            if(subCategoryModel.priorityId == PRIORITY.HIGH) {
+                binding.isPriorityIv.setColorFilter(context.getColor(android.R.color.holo_red_light))
+            } else if (subCategoryModel.priorityId == PRIORITY.MEDIUM) {
+                binding.isPriorityIv.setColorFilter(context.getColor(android.R.color.holo_orange_light))
+            } else if(subCategoryModel.priorityId == PRIORITY.LOW) {
+                binding.isPriorityIv.setColorFilter(context.getColor(android.R.color.holo_blue_dark))
+            }
             setColorForViewAndText(context)
         }
 

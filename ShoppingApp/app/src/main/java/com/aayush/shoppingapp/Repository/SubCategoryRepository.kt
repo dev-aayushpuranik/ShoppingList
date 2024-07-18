@@ -26,7 +26,7 @@ class SubCategoryRepository {
         CoroutineScope(Dispatchers.IO).launch {
             val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
 
-            withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAll(categoryId).orDefault()) }
+            withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAll(categoryId)?.sortedBy { it.priorityId }.orDefault()) }
         }
     }
 
@@ -34,7 +34,7 @@ class SubCategoryRepository {
         CoroutineScope(Dispatchers.IO).launch {
             val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
 
-            withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAllSubCategories().orDefault()) }
+            withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAllSubCategories()?.sortedBy { it.priorityId }.orDefault()) }
         }
     }
 
@@ -107,10 +107,10 @@ class SubCategoryRepository {
         for (category in subCategories) {
             list.add(getSubCategoryTable(category))
         }
-        return list.toList()
+        return list.toList().sortedBy { it.priorityId }
     }
 
     private fun getSubCategoryTable(model: SubCategoryListModel) : SubcategoryTable {
-        return SubcategoryTable(model.subtaskItemId, model.categoryId, model.subtaskName, model.subtaskDescription, model.isTaskDone, model.isImportant, model.priorityId)
+        return SubcategoryTable(model.subtaskItemId, model.categoryId, model.subtaskName, model.subtaskDescription, model.isTaskDone, model.isImportant, model.priorityId.value)
     }
 }
