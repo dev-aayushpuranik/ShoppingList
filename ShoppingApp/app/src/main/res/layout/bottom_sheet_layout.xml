@@ -22,40 +22,65 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/priorityTitle"
+        style="@style/BottomSheetTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginStart="10dp"
+        android:gravity="center"
+        android:text="Priority:"
+        app:layout_constraintBottom_toTopOf="@+id/saveTaskBtn"
+        app:layout_constraintEnd_toStartOf="@+id/prioritySelector"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/isImportantCheckbox"
+        app:layout_constraintTop_toBottomOf="@+id/subTaskNameInputLayout" />
+
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/saveTaskBtn"
         style="@style/Widget.AppCompat.Button"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:background="@color/toolbarColor"
         android:padding="10dp"
-        android:layout_margin="10dp"
         android:text="@string/save"
         android:textColor="@color/toolbarTitleColor"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/isImportantCheckbox" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/priorityTitle" />
+
+    <androidx.appcompat.widget.AppCompatSpinner
+        android:id="@+id/prioritySelector"
+        style="@style/BottomSheetTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="35dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/priorityTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/priorityTitle"
+        app:layout_constraintTop_toTopOf="@+id/priorityTitle" />
 
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/isImportantCheckbox"
         style="@style/BottomSheetTextStyle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
+        android:drawableTint="@color/toolbarColor"
         android:paddingVertical="5dp"
         android:paddingStart="5dp"
         android:text="@string/important_ques"
         android:visibility="visible"
-        android:drawableTint="@color/toolbarColor"
-        app:layout_constraintBottom_toBottomOf="@+id/saveTaskBtn"
-        app:layout_constraintEnd_toStartOf="@+id/saveTaskBtn"
+        app:layout_constraintBottom_toBottomOf="@+id/priorityTitle"
+        app:layout_constraintEnd_toStartOf="@+id/priorityTitle"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/saveTaskBtn"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toTopOf="@+id/priorityTitle" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/categoryNameLayout"
@@ -95,7 +120,7 @@
         app:expandedHintEnabled="true"
         app:hintAnimationEnabled="true"
         app:hintEnabled="true"
-        app:layout_constraintBottom_toTopOf="@+id/saveTaskBtn"
+        app:layout_constraintBottom_toTopOf="@+id/priorityTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
