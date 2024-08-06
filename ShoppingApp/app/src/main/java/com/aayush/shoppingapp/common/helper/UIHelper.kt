@@ -57,6 +57,7 @@ class UIHelper {
                 .setMessage(body)
                 .setCancelable(false)
                 .setNegativeButton(context.getString(R.string.ok)) { listener, _ ->
+                    okButtonCLicked()
                     listener.dismiss()
                 }
                 .show()
