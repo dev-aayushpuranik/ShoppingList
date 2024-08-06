@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         window.clearFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND)
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
-        window.statusBarColor = ContextCompat.getColor(this, R.color.toolbarColor)
+        window.statusBarColor = ContextCompat.getColor(this, R.color.recyclerViewBG)
         setToolbar(getString(R.string.app_name), null)
 
         supportFragmentManager
