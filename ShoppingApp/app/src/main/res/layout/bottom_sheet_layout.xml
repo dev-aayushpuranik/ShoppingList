@@ -5,7 +5,7 @@
     style="@style/ThemeOverlay.YourApp.BottomSheetDialog"
     android:layout_width="match_parent"
     android:layout_height="250dp"
-    android:background="@drawable/rounded_corners"
+    android:background="@color/recycler_row_view_bg"
     android:clickable="true"
     app:behavior_hideable="true"
     app:behavior_peekHeight="40dp"
@@ -16,7 +16,7 @@
         style="@style/HeaderTextStyle"
         android:layout_width="match_parent"
         android:layout_height="36dp"
-        android:background="@color/headerColor"
+        android:background="@drawable/subcategory_bg"
         android:gravity="center"
         android:text="@string/add_new_Item"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,22 +33,20 @@
         app:layout_constraintBottom_toTopOf="@+id/saveTaskBtn"
         app:layout_constraintEnd_toStartOf="@+id/prioritySelector"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/isImportantCheckbox"
+        app:layout_constraintStart_toEndOf="@+id/isImportantLayout"
         app:layout_constraintTop_toBottomOf="@+id/subTaskNameInputLayout" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/saveTaskBtn"
-        style="@style/Widget.AppCompat.Button"
-        android:layout_width="match_parent"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@color/toolbarColor"
-        android:padding="10dp"
         android:text="@string/save"
-        android:textColor="@color/toolbarTitleColor"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/app_text_color"
         android:textSize="14sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/priorityTitle" />
 
@@ -65,8 +63,8 @@
         app:layout_constraintStart_toEndOf="@+id/priorityTitle"
         app:layout_constraintTop_toTopOf="@+id/priorityTitle" />
 
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/isImportantCheckbox"
+    <LinearLayout
+        android:id="@+id/isImportantLayout"
         style="@style/BottomSheetTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -76,11 +74,27 @@
         android:paddingStart="5dp"
         android:text="@string/important_ques"
         android:visibility="visible"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="@+id/priorityTitle"
         app:layout_constraintEnd_toStartOf="@+id/priorityTitle"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/priorityTitle" />
+        app:layout_constraintTop_toTopOf="@+id/priorityTitle"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/is_Important_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/unimportant_icon"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/BottomSheetTextStyle"
+            android:text="Important?"/>
+
+    </LinearLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/categoryNameLayout"
@@ -89,7 +103,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="8dp"
         android:hint="@string/add_new_Item"
-        android:textColorHint="@color/app_text_color"
+        android:textColorHint="@color/hint_color"
         app:expandedHintEnabled="true"
         app:hintAnimationEnabled="true"
         app:hintEnabled="true"
@@ -116,7 +130,7 @@
         android:autofillHints=""
         android:hint="@string/item_description_optional"
         android:inputType="textAutoComplete"
-        android:textColorHint="@color/app_text_color"
+        android:textColorHint="@color/hint_color"
         app:expandedHintEnabled="true"
         app:hintAnimationEnabled="true"
         app:hintEnabled="true"
