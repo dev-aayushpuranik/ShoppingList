@@ -10,6 +10,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppLauncherStyle" >
         <activity
+            android:name=".views.SettingsActivity"
+            android:exported="false"
+            android:configChanges="uiMode|screenSize|orientation"
+            android:windowSoftInputMode="adjustUnspecified"/>
+        <activity
             android:name=".views.MainActivity"
             android:exported="true"
             android:configChanges="uiMode|screenSize|orientation"
