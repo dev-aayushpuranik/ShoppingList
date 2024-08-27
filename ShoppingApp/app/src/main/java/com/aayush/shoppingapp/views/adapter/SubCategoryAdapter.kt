@@ -75,7 +75,7 @@ class SubCategoryAdapter(
             binding.isCompletedIv.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.app_text_color))
             binding.subCategoryTitleTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
             binding.subCategoryDescriptionTvTv.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
-            binding.cardView.background = ContextCompat.getDrawable(context, R.drawable.rounded_corners)
+            binding.cardView.background = ContextCompat.getDrawable(context, R.drawable.subcategory_bg)
             binding.separate.background = ContextCompat.getDrawable(context, R.color.headerColor)
         }
     }

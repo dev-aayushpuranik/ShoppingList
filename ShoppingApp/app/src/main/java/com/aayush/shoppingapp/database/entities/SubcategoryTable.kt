@@ -12,5 +12,7 @@ data class SubcategoryTable(
     val subCategoryDescription: String,
     val isTaskDone: Boolean,
     val isImportant: Boolean,
-    val priorityId: Int
+    val priorityId: Int,
+    val dueDate:Long?,
+    val remind_at:Long?
 )

@@ -5,10 +5,19 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.aayush.shoppingapp.database.dao.SubcategoryDao
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 
-@Database(entities = [SubcategoryTable::class], version = 2)
+
+//var MIGRATION_3_4: Migration = object : Migration(3, 4) {
+//    override fun migrate(database: SupportSQLiteDatabase) {
+//        database.execSQL("ALTER TABLE 'SubcategoryTable' ADD COLUMN 'remind_at' Long")
+//    }
+//}
+@Database(entities = [SubcategoryTable::class], version = 4,
+    autoMigrations = [AutoMigration(from = 3, to = 4)], exportSchema = true)
 abstract class SubCategoryDatabase : RoomDatabase() {
 
     abstract fun SubcategoryDao(): SubcategoryDao
@@ -27,7 +36,10 @@ abstract class SubCategoryDatabase : RoomDatabase() {
                     context.applicationContext,
                     SubCategoryDatabase::class.java,
                     "SubCategoryDatabase"
-                ).fallbackToDestructiveMigration().build()
+                )
+//                    .addMigrations(MIGRATION_3_4)
+                    .allowMainThreadQueries()
+                    .build()
                 INSTANCE = instance
                 // return instance
                 instance

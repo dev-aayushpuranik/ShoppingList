@@ -66,13 +66,15 @@ class SubCategoryViewModel: ViewModel() {
     }
 
     fun getSubCategoriesFromDB(requireContext: Context) {
-        if (mCategoryId == 0L) {
+        if (mCategoryId == 0L || mCategoryId == -1L) {
             mRepo?.getAllSubCategoriesFromDB(requireContext) { it ->
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     arrayList.clear()
-                    val list = getSubCategories(it).filter { it.isImportant || it.categoryId == 0L }
-                    arrayList.addAll(list)
+                    if(mCategoryId == 0L) {
+                        val list = getSubCategories(it).filter { it.isImportant || it.categoryId == 0L }
+                        arrayList.addAll(list)
+                    }
                     subCategories.value = arrayList.toList()
                 }
             }
@@ -106,7 +108,17 @@ class SubCategoryViewModel: ViewModel() {
     private fun getSubCategory(table: SubcategoryTable?): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
         table?.let {
-            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, getSelectedPriorityForTask(it.priorityId))
+            model = SubCategoryListModel(
+                it.subtaskItemId,
+                it.categoryId,
+                it.subCategoryName,
+                it.subCategoryDescription,
+                it.isTaskDone,
+                it.isImportant,
+                getSelectedPriorityForTask(it.priorityId),
+                it.dueDate,
+                it.remind_at
+            )
         }
         return model
     }
@@ -121,7 +133,7 @@ class SubCategoryViewModel: ViewModel() {
             model = SubcategoryTable(
                 it.subtaskItemId, it.categoryId,
                 it.subtaskName, it.subtaskDescription,
-                it.isTaskDone, it.isImportant, it.priorityId.value)
+                it.isTaskDone, it.isImportant, it.priorityId.value, table.dueDate,table.remindAt)
         }
         return model
     }

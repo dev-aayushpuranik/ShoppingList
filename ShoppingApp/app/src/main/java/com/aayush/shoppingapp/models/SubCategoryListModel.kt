@@ -9,5 +9,7 @@ data class SubCategoryListModel(
     val subtaskDescription: String,
     var isTaskDone: Boolean,
     var isImportant: Boolean,
-    val priorityId: PRIORITY
+    val priorityId: PRIORITY,
+    var dueDate: Long?,
+    val remindAt: Long?
 )

@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 class SubCategoryRepository {
 
@@ -111,6 +112,6 @@ class SubCategoryRepository {
     }
 
     private fun getSubCategoryTable(model: SubCategoryListModel) : SubcategoryTable {
-        return SubcategoryTable(model.subtaskItemId, model.categoryId, model.subtaskName, model.subtaskDescription, model.isTaskDone, model.isImportant, model.priorityId.value)
+        return SubcategoryTable(model.subtaskItemId, model.categoryId, model.subtaskName, model.subtaskDescription, model.isTaskDone, model.isImportant, model.priorityId.value,model.dueDate,model.remindAt)
     }
 }
