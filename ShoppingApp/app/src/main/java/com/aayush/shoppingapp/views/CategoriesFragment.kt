@@ -14,15 +14,10 @@ import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.enableSavedStateHandles
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_DRAG
-import androidx.recyclerview.widget.ItemTouchHelper.DOWN
-import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.aayush.shoppingapp.OnDayNightStateChanged
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
@@ -39,7 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 
-class CategoriesFragment : Fragment(), OnDayNightStateChanged {
+class CategoriesFragment : Fragment() {
 
     private lateinit var binding: FragmentCategoriesBinding
     private lateinit var categoryViewModel: CategoriesViewModel
@@ -147,9 +142,9 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
                 })
             } else {
                 UIHelper.showAlertDialog(
-                    requireContext(), "Unable to Delete",
-                    "This is not a deletable item because it just showes the list of important items and it is added only if there are any important items marked"
-                ) {
+                    requireContext(),
+                    getString(R.string.unable_to_delete),
+                    getString(R.string.imp_item_delete_message)) {
                     mAdapter.notifyDataSetChanged()
                 }
             }
@@ -162,13 +157,13 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
     private fun setAddCategoryView() {
         bottomSheetBehavior = BottomSheetBehavior.from(binding.bottomSheetLayout.addCategoryView)
         setBottomSheetStateCollapse()
-        enableSavedButton()
+        enableSaveButton()
 
         binding.bottomSheetLayout.categoryNameTV.doOnTextChanged { text, start, before, count ->
             isSaveButtonEnabled = count > 0;
-            enableSavedButton()
+            enableSaveButton()
         }
-        binding.bottomSheetLayout.categoryDescriptionTv.SetViewVisible(false)
+        binding.bottomSheetLayout.subTaskNameInputLayout.SetViewVisible(false)
 
         bottomSheetBehavior.addBottomSheetCallback(object :
             BottomSheetBehavior.BottomSheetCallback() {
@@ -181,7 +176,7 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
         }
     }
 
-    private fun enableSavedButton() {
+    private fun enableSaveButton() {
         if(isSaveButtonEnabled) {
             binding.bottomSheetLayout.saveTaskBtn.setTextColor(ContextCompat.getColor(requireContext(), R.color.app_text_color))
             binding.bottomSheetLayout.saveTaskBtn.setOnClickListener {
@@ -279,11 +274,6 @@ class CategoriesFragment : Fragment(), OnDayNightStateChanged {
             .replace(R.id.container, SubtaskListFragment(category, importantItem))
             .addToBackStack("SubtaskListFragmentStack")
             .commit()
-    }
-
-    override fun onDayNightApplied(state: Int) {
-        applyDayNightMode()
-        mAdapter.notifyDataSetChanged()
     }
 
     private fun applyDayNightMode() {
