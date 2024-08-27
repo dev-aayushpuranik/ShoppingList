@@ -86,7 +86,7 @@ class CategoriesViewModel : ViewModel() {
     private fun getSubCategory(table: SubcategoryTable?): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
         table?.let {
-            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, getSelectedPriorityForTask(it.priorityId))
+            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, getSelectedPriorityForTask(it.priorityId), it.dueDate,it.remind_at)
         }
         return model
     }

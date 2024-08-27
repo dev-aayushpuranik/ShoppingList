@@ -12,6 +12,29 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="40dp"
         tools:context=".views.CategoriesFragment">
+        <ImageView
+            android:id="@+id/itemArrangeIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/baseline_list_24"
+            app:tint="@color/app_text_color"
+            app:layout_constraintEnd_toStartOf="@+id/settingsMenu"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/settingsMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/baseline_more_vert_24"
+            app:tint="@color/app_text_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ProgressBar
             android:id="@+id/progressbar"
@@ -46,7 +69,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toBottomOf="@+id/itemArrangeIcon" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/addSubTaskFAB"

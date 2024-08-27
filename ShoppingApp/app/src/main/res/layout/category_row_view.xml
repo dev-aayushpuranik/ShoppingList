@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/recycler_row_view_bg"
-    android:layout_marginVertical="5dp"
+    android:layout_margin="5dp"
     app:cardCornerRadius="10dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_margin="10dp"
+        android:layout_height="40dp"
+        android:layout_margin="5dp"
         android:orientation="vertical">
 
         <ImageView
             android:id="@+id/imageView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="10dp"
             app:tint="@color/app_text_color"
             android:src="@drawable/ic_baseline_format_list_bulleted_24"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -28,33 +26,35 @@
 
         <TextView
             android:id="@+id/categoryNameTV"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
             style="@style/ListTitleTextStyle"
-            app:layout_constraintBottom_toTopOf="@+id/DiscriptionNameTV"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical|start"
+            android:layout_marginHorizontal="5dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/priorityIcon"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/imageView2"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/DiscriptionNameTV"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            style="@style/DescriptionTextStyle"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/priorityIcon"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/imageView2"
-            app:layout_constraintTop_toBottomOf="@+id/categoryNameTV" />
+<!--        <TextView-->
+<!--            android:id="@+id/DiscriptionNameTV"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            style="@style/DescriptionTextStyle"-->
+<!--            android:visibility="gone"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/priorityIcon"-->
+<!--            app:layout_constraintHorizontal_bias="0.5"-->
+<!--            app:layout_constraintStart_toEndOf="@+id/imageView2"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/categoryNameTV" />-->
 
         <ImageView
             android:id="@+id/priorityIcon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="10dp"
-            android:src="@drawable/ic_baseline_format_list_bulleted_24"
+            android:src="@drawable/priority_high_icon"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"

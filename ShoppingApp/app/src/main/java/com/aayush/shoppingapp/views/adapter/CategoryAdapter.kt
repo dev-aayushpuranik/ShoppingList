@@ -2,9 +2,6 @@ package com.aayush.shoppingapp.views.adapter
 
 import android.content.Context
 import android.content.res.ColorStateList
-import android.graphics.ColorFilter
-import android.util.LogPrinter
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
@@ -86,16 +83,7 @@ class CategoryViewHolder(private val context: Context, private val binding: Cate
         }
         binding.priorityIcon.setImageResource(R.drawable.priority_high_icon)
         binding.categoryNameTV.text = model.CategoryName
-        binding.DiscriptionNameTV.text = model.Description
-        binding.DiscriptionNameTV.SetViewVisible(model.Description.isNotEmpty())
-
-        val value = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10F, context.resources.displayMetrics)
-        binding.cardView.radius = value
-        binding.cardView.preventCornerOverlap = true
-        binding.cardView.useCompatPadding = true
-
-        binding.cardView.background = ContextCompat.getDrawable(context, R.drawable.rounded_corners)
-        binding.categoryNameTV.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
-        binding.DiscriptionNameTV.setTextColor(ContextCompat.getColor(context, R.color.app_text_color))
+//        binding.DiscriptionNameTV.text = model.Description
+//        binding.DiscriptionNameTV.SetViewVisible(model.Description.isNotEmpty())
     }
 }
