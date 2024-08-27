@@ -8,7 +8,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
-import com.aayush.shoppingapp.OnDayNightStateChanged
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.databinding.ActivityMainBinding
@@ -18,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
         super.onCreate(savedInstanceState)
         setTheme(R.style.ShoppingAppTheme)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -38,14 +37,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        binding.root.setBackgroundColor(ContextCompat.getColor(this, R.color.recyclerViewBG))
-
-        supportFragmentManager.fragments.forEach {
-            if(it is OnDayNightStateChanged) {
-                it.onDayNightApplied(state = nightModeFlags)
-            }
-        }
+        recreate()
     }
 
     fun setToolbar(title: String, onBackPress: (() -> Unit?)?) {
