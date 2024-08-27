@@ -14,13 +14,30 @@
     <TextView
         android:id="@+id/addCategoryTitle"
         style="@style/HeaderTextStyle"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="36dp"
+        android:paddingStart="10dp"
         android:background="@drawable/subcategory_bg"
-        android:gravity="center"
+        android:gravity="start|center_vertical"
         android:text="@string/add_new_Item"
+        app:layout_constraintEnd_toStartOf="@+id/saveTaskBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/saveTaskBtn"
+        style="@style/Widget.Material3.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:text="@string/save"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="@color/app_text_color"
+        android:textSize="14sp"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/addCategoryTitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/addCategoryTitle" />
 
     <TextView
         android:id="@+id/priorityTitle"
@@ -30,25 +47,11 @@
         android:layout_marginStart="10dp"
         android:gravity="center"
         android:text="Priority:"
-        app:layout_constraintBottom_toTopOf="@+id/saveTaskBtn"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/prioritySelector"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/isImportantLayout"
         app:layout_constraintTop_toBottomOf="@+id/subTaskNameInputLayout" />
-
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/saveTaskBtn"
-        style="@style/Widget.MaterialComponents.Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/save"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:textColor="@color/app_text_color"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/priorityTitle" />
 
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/prioritySelector"
@@ -118,6 +121,7 @@
             style="@style/BottomSheetTextStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:lines="2"
             android:maxLines="3" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -134,6 +138,7 @@
         app:expandedHintEnabled="true"
         app:hintAnimationEnabled="true"
         app:hintEnabled="true"
+        android:visibility="gone"
         app:layout_constraintBottom_toTopOf="@+id/priorityTitle"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
