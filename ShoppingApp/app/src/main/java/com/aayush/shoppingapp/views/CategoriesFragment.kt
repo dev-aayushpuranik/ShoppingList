@@ -1,5 +1,6 @@
 package com.aayush.shoppingapp.views
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
@@ -11,9 +12,13 @@ import android.widget.ArrayAdapter
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.preferencesDataStore
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +36,7 @@ import com.aayush.shoppingapp.views.adapter.CategoryAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -42,8 +48,11 @@ class CategoriesFragment : Fragment() {
     private lateinit var mAdapter: CategoryAdapter
     private var mIsReorderingFlagTrue: Boolean = false
     private var mEditableCategoryListModel: CategoryModel? = null
-    private var hasListArrangement:Boolean = true
+    private var hasListArrangement:Boolean = false
     private var isSaveButtonEnabled = false
+    private val Preference_Name = "UserManagerDataStore"
+    private val Context.dataStore by preferencesDataStore(name = Preference_Name)
+    private val ArrangeForCategoryList = booleanPreferencesKey("ArrangeForCategoryList")
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,6 +60,13 @@ class CategoriesFragment : Fragment() {
     ): View {
         binding = FragmentCategoriesBinding.inflate(inflater, container, false)
         categoryViewModel = ViewModelProvider(requireActivity())[CategoriesViewModel::class.java]
+
+        lifecycleScope.launch {
+           requireContext().dataStore.data.collectLatest {
+               hasListArrangement = it[ArrangeForCategoryList] ?: false
+               rearrangeView()
+            }
+        }
         setView()
         loadData()
         setAddCategoryView()
@@ -72,7 +88,6 @@ class CategoriesFragment : Fragment() {
                     Editable.Factory.getInstance().newEditable(it.Description)
             })
         binding.categoriesRV.adapter = mAdapter
-        rearrangeView()
         binding.itemArrangeIcon.setOnClickListener {
             hasListArrangement = !hasListArrangement
             rearrangeView()
@@ -104,12 +119,18 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun rearrangeView() {
-        if (hasListArrangement) {
+        if (hasListArrangement || (categoryViewModel.categories.value?.count() ?: 0) < 2) {
             binding.categoriesRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             binding.itemArrangeIcon.setImageResource(R.drawable.baseline_grid_view_24)
         } else {
             binding.categoriesRV.layoutManager = GridLayoutManager(context, 2)
             binding.itemArrangeIcon.setImageResource(R.drawable.baseline_list_24)
+        }
+
+        lifecycleScope.launch {
+            requireActivity().dataStore.edit { preferences ->
+                preferences[ArrangeForCategoryList] = hasListArrangement
+            }
         }
         mAdapter.notifyDataSetChanged()
     }
@@ -126,6 +147,9 @@ class CategoriesFragment : Fragment() {
                 binding.noTaskView.SetViewVisible(it.isEmpty())
                 mAdapter.data = it
                 setRowSwipeForRV()
+                if((categoryViewModel.categories.value?.count() ?: 0) < 2) {
+                    rearrangeView()
+                }
             }
         }
         categoryViewModel.categories.observe(this.viewLifecycleOwner, categoryDataObserver)
@@ -194,6 +218,9 @@ class CategoriesFragment : Fragment() {
                     binding.bottomSheetLayout.categoryDescriptionTv.text = null
                 } else {
                     UIHelper.toast(requireContext(), getString(R.string.task_name_cannot_be_empty))
+                }
+                if((categoryViewModel.categories.value?.count() ?: 0) < 2) {
+                    rearrangeView()
                 }
             }
         } else {

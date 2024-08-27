@@ -4,7 +4,7 @@
     android:id="@+id/add_category_view"
     style="@style/ThemeOverlay.YourApp.BottomSheetDialog"
     android:layout_width="match_parent"
-    android:layout_height="250dp"
+    android:layout_height="200dp"
     android:background="@color/recycler_row_view_bg"
     android:clickable="true"
     app:behavior_hideable="true"
@@ -16,9 +16,9 @@
         style="@style/HeaderTextStyle"
         android:layout_width="0dp"
         android:layout_height="36dp"
-        android:paddingStart="10dp"
+        android:paddingHorizontal="10dp"
         android:gravity="start|center_vertical"
-        android:text="Add New Item"
+        android:text="@string/add_new_item"
         app:layout_constraintEnd_toStartOf="@+id/saveTaskBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -43,9 +43,10 @@
         style="@style/ListTitleTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
         android:gravity="center"
-        android:text="Priority:"
+        android:text="@string/priority"
+        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/prioritySelector"
         app:layout_constraintHorizontal_bias="0.5"
@@ -73,7 +74,7 @@
         android:layout_marginStart="10dp"
         android:drawableTint="@color/toolbarColor"
         android:paddingVertical="5dp"
-        android:paddingStart="5dp"
+        android:paddingHorizontal="5dp"
         android:text="@string/important_ques"
         android:visibility="visible"
         android:gravity="center"
@@ -88,13 +89,15 @@
             android:id="@+id/is_Important_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/unimportant_icon"/>
+            android:src="@drawable/unimportant_icon"
+            android:contentDescription="@string/important_icon" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/BottomSheetTextStyle"
-            android:text="Important?"/>
+            android:layout_marginHorizontal="5dp"
+            android:text="@string/important_ques_mark"/>
 
     </LinearLayout>
 
@@ -120,7 +123,6 @@
             style="@style/BottomSheetTextStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lines="2"
             android:maxLines="3" />
     </com.google.android.material.textfield.TextInputLayout>
 

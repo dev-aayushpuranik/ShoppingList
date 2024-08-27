@@ -29,6 +29,10 @@
     <string name="all_items">All Items</string>
     <string name="unable_to_delete">Unable to Delete</string>
     <string name="imp_item_delete_message">This is not a deletable item because it just showes the list of important items and it is added only if there are any important items marked</string>
+    <string name="important_icon">Important icon</string>
+    <string name="important_ques_mark">Important?</string>
+    <string name="add_new_item">Add New Item</string>
+    <string name="priority">Priority:</string>
 
     <string-array name="priority_level">
         <item>High</item>
