@@ -15,4 +15,5 @@
     <color name="app_text_color">@color/white</color>
     <color name="recycler_row_view_bg">#3A3939</color>
     <color name="hint_color">#CCCCCC</color>
+    <color name="separator_color">#797979</color>
 </resources>

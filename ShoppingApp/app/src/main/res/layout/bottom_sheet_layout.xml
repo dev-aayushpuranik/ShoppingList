@@ -17,9 +17,8 @@
         android:layout_width="0dp"
         android:layout_height="36dp"
         android:paddingStart="10dp"
-        android:background="@drawable/subcategory_bg"
         android:gravity="start|center_vertical"
-        android:text="@string/add_new_Item"
+        android:text="Add New Item"
         app:layout_constraintEnd_toStartOf="@+id/saveTaskBtn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -41,7 +40,7 @@
 
     <TextView
         android:id="@+id/priorityTitle"
-        style="@style/BottomSheetTextStyle"
+        style="@style/ListTitleTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:layout_marginStart="10dp"
