@@ -44,13 +44,16 @@ class SubCategoryViewModel: ViewModel() {
         }
     }
 
-    fun updateCategoryItem(context: Context, subtaskListModel: SubCategoryListModel) {
+    fun updateCategoryItem(context: Context, subtaskListModel: SubCategoryListModel,
+                           onSuccess:()->Unit, onFail:()->Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             mRepo?.updateSubCategoryItem(context, getSubCategoryTableItem(subtaskListModel),
                 onSuccess = {
                     getSubCategoriesFromDB(context)
+                    onSuccess()
                 }, onError = {
                     errorModel.value = "Something went wrong"
+                    onFail()
                 })
         }
     }

@@ -18,7 +18,7 @@ class SubCategoryAdapter(
     private val context: Context,
     private val onImportantItemClick: (SubCategoryListModel) -> Unit,
     private val onTaskDoneIconClick: (SubCategoryListModel) -> Unit,
-    private val onLongClickListener: (SubCategoryListModel) -> Unit
+    private val clickListener: (SubCategoryListModel) -> Unit
 ) : RecyclerView.Adapter<SubCategoryAdapter.SubCategoryViewHolder>() {
 
     var data: List<SubCategoryListModel> = arrayListOf()
@@ -31,13 +31,13 @@ class SubCategoryAdapter(
         private val binding:SubcategoryRowViewBinding,
         onImportantItemClick: (Int) -> Unit,
         onTaskDoneIconClick: (Int) -> Unit,
-        onLongClickListener: (Int) -> Unit
+        clickListener: (Int) -> Unit
     ) :
         RecyclerView.ViewHolder(binding.root) {
         init {
             binding.isImportantIv.setOnClickListener { onImportantItemClick(adapterPosition) }
             binding.isCompletedIv.setOnClickListener { onTaskDoneIconClick(adapterPosition) }
-            binding.cardView.setOnClickListener { onLongClickListener(adapterPosition) }
+            binding.cardView.setOnClickListener { clickListener(adapterPosition) }
         }
 
         fun bind(context: Context, subCategoryModel: SubCategoryListModel) {
@@ -86,7 +86,7 @@ class SubCategoryAdapter(
         return SubCategoryViewHolder(binding,
             { index -> onImportantItemClicked(data[index]) },
             { index -> onDoneItemClicked(data[index]) },
-            { index -> onLongClickListener(data[index])})
+            { index -> clickListener(data[index])})
     }
 
     private fun onDoneItemClicked(item: SubCategoryListModel) {
