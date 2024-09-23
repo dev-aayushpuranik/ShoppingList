@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         setTheme(R.style.ShoppingAppTheme)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -35,12 +35,12 @@ class MainActivity : AppCompatActivity() {
         registerBackPressEvent()
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        recreate()
-    }
+//    override fun onConfigurationChanged(newConfig: Configuration) {
+//        super.onConfigurationChanged(newConfig)
+//        recreate()
+//    }
 
-    fun setToolbar(title: String, onBackPress: (() -> Unit?)?) {
+    private fun setToolbar(title: String, onBackPress: (() -> Unit?)?) {
         binding.toolbar.toolbarTitle.text = title
         binding.toolbar.toolbarBackArrow.SetViewVisible(onBackPress != null)
         binding.toolbar.toolbarBackArrow.setOnClickListener { onBackPress?.invoke() }
@@ -53,7 +53,9 @@ class MainActivity : AppCompatActivity() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             try {
-                if (supportFragmentManager.fragments.size > 0 && (supportFragmentManager.fragments[0] is SubtaskListFragment)) {
+                if (supportFragmentManager.fragments.size > 0
+                    && ((supportFragmentManager.fragments[0] is SubtaskListFragment)
+                            || (supportFragmentManager.fragments[0] is EditFragment))) {
                     supportFragmentManager.popBackStack()
                 } else {
                     showAlertDialog()

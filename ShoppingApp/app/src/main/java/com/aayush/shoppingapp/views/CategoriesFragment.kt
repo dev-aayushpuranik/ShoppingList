@@ -3,8 +3,8 @@ package com.aayush.shoppingapp.views
 import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Canvas
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,12 +19,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
-import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.common.helper.UIHelper
-import com.aayush.shoppingapp.common.helpers.SwipeHelper
+import com.aayush.shoppingapp.common.helpers.SwipeController
+import com.aayush.shoppingapp.common.helpers.SwipeControllerActions
 import com.aayush.shoppingapp.databinding.FragmentCategoriesBinding
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.viewModels.CategoriesViewModel
@@ -34,6 +35,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
+
 
 class CategoriesFragment : Fragment() {
 
@@ -48,6 +50,7 @@ class CategoriesFragment : Fragment() {
     private val SharedPreferenceDB = "SharedPreferenceDB"
     private var isListArrangement = false
     private lateinit var sharedPref: SharedPreferences
+    private var swipeController: SwipeController? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,21 +67,7 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setView() {
-        mAdapter = CategoryAdapter({ navigateToSubTaskList(it) },
-            {
-                if(it.CategoryId != 0L) {
-                    mEditableCategoryListModel = it
-                    mIsReorderingFlagTrue = true
-                    setBottomSheetStateExpand()
-                    binding.bottomSheetLayout.addCategoryTitle.text =
-                        "Edit Item ${mEditableCategoryListModel?.CategoryName.orDefault()}"
-                    binding.bottomSheetLayout.categoryNameTV.text =
-                        Editable.Factory.getInstance().newEditable(it.CategoryName)
-                    binding.bottomSheetLayout.categoryDescriptionTv.text =
-                        Editable.Factory.getInstance().newEditable(it.Description)
-                    binding.bottomSheetLayout.prioritySelector.setSelection(it.priorityId.value - 1)
-                }
-            })
+        mAdapter = CategoryAdapter({ navigateToSubTaskList(it) }, null)
         binding.categoriesRV.adapter = mAdapter
         binding.itemArrangeIcon.setOnClickListener {
             isListArrangement = !isListArrangement
@@ -111,6 +100,13 @@ class CategoriesFragment : Fragment() {
     private fun navigateToSettingsPage() {
         val intent = Intent(requireActivity(), SettingsActivity::class.java);
         startActivity(intent)
+    }
+
+    private fun navigateToEditPage(categoryModel: CategoryModel) {
+        parentFragmentManager
+            .beginTransaction()
+            .replace(R.id.container, EditFragment(categoryModel))
+            .addToBackStack("EditFragment").commit()
     }
 
     private fun rearrangeView(isListArrangement: Boolean) {
@@ -148,26 +144,38 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setRowSwipeForRV() {
-        val sh = SwipeHelper(requireContext()) { viewHolder: RecyclerView.ViewHolder, _: Int ->
-            if (categoryViewModel.categories.value?.isNotEmpty() == true
-                && (categoryViewModel.categories.value?.get(viewHolder.adapterPosition)?.CategoryId != 0L)) {
-                UIHelper.showDeleteAlertDialog(requireContext(), {
-                    deleteItemOnOkButtonClick(viewHolder.adapterPosition)
-                }, {
-                    mAdapter.notifyDataSetChanged()
-                })
-            } else {
-                UIHelper.showAlertDialog(
-                    requireContext(),
-                    getString(R.string.unable_to_delete),
-                    getString(R.string.imp_item_delete_message)) {
-                    mAdapter.notifyDataSetChanged()
+        binding.categoriesRV.layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+        binding.categoriesRV.adapter = mAdapter
+        swipeController = SwipeController(object : SwipeControllerActions() {
+            override fun onRightClicked(position: Int) {
+                if (categoryViewModel.categories.value?.isNotEmpty() == true
+                    && (categoryViewModel.categories.value?.get(position)?.CategoryId != 0L)) {
+                    deleteItemOnOkButtonClick(position)
+                } else {
+                    UIHelper.showAlertDialog(
+                        requireContext(),
+                        getString(R.string.unable_to_delete),
+                        getString(R.string.imp_item_delete_message)) {
+                        mAdapter.notifyDataSetChanged()
+                    }
                 }
             }
-        }
 
-        val itemTouchHelper = ItemTouchHelper(sh)
-        itemTouchHelper.attachToRecyclerView(binding.categoriesRV)
+            override fun onLeftClicked(position: Int) {
+                categoryViewModel.categories?.value?.get(position)?.let { navigateToEditPage(it) }
+            }
+        })
+
+        swipeController?.let {
+            binding.categoriesRV.addItemDecoration(object : ItemDecoration() {
+                override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+                    it.onDraw(c)
+                }
+            })
+
+            val itemTouchHelper = ItemTouchHelper(it)
+            itemTouchHelper.attachToRecyclerView(binding.categoriesRV)
+        }
     }
 
     private fun setAddCategoryView() {

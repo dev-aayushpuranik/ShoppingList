@@ -1,5 +1,6 @@
 package com.aayush.shoppingapp.views
 
+import android.graphics.Canvas
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,7 +20,8 @@ import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.setAdapterWithLinearLayout
 import com.aayush.shoppingapp.common.helper.UIHelper
-import com.aayush.shoppingapp.common.helpers.SwipeHelper
+import com.aayush.shoppingapp.common.helpers.SwipeController
+import com.aayush.shoppingapp.common.helpers.SwipeControllerActions
 import com.aayush.shoppingapp.databinding.FragmentSubtaskListBinding
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
@@ -43,6 +45,8 @@ class SubtaskListFragment() : Fragment() {
     private var mSubcategoryImportantItems = listOf<SubCategoryListModel>()
     private var isImportantItemMarked: Boolean = false
     private var isSaveButtonEnabled = false
+    private var pendingListSwipeController: SwipeController? = null
+    private var completedListSwipeController: SwipeController? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -79,6 +83,25 @@ class SubtaskListFragment() : Fragment() {
 
     private fun setView() {
         setToolbar(categoryModel?.CategoryName?: "") { navigateToPreviousScreen() }
+
+        pendingListSwipeController = SwipeController(object : SwipeControllerActions() {
+            override fun onRightClicked(position: Int) {
+                subCategoryViewModel?.subCategories?.value?.get(position)?.apply {
+                    deleteSubCategoryItemFromDB(this)
+                }
+            }
+        })
+
+        pendingListSwipeController?.let {
+            binding.subtaskRV.addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+                    it.onDraw(c)
+                }
+            })
+
+            val itemTouchHelper = ItemTouchHelper(it)
+            itemTouchHelper.attachToRecyclerView(binding.subtaskRV)
+        }
         pendingTaskAdapter = SubCategoryAdapter(requireContext(), {
             if (categoryModel?.CategoryId != 0L) {
                 it.isImportant = !it.isImportant
@@ -94,16 +117,25 @@ class SubtaskListFragment() : Fragment() {
         })
         binding.subtaskRV.setAdapterWithLinearLayout(requireContext(), pendingTaskAdapter)
 
-        val sh = SwipeHelper(requireContext(), onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
-                val item: SubCategoryListModel = pendingTaskAdapter.data[viewHolder.adapterPosition]
-                deleteSubCategoryItemFromDB(item)
-                UIHelper.snackBar(binding.subtaskRV, "Deleted " + item.subtaskName, "Undo") {
-                    addSubCategoryItemToDB(item)
-                    pendingTaskAdapter.notifyDataSetChanged()
+        completedListSwipeController = SwipeController(object : SwipeControllerActions() {
+            override fun onRightClicked(position: Int) {
+                subCategoryViewModel?.subCategories?.value?.get(position)?.apply {
+                    deleteSubCategoryItemFromDB(this)
+                }
+            }
+        })
+
+        completedListSwipeController?.let {
+            binding.subtaskRV.addItemDecoration(object : RecyclerView.ItemDecoration() {
+                override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
+                    it.onDraw(c)
                 }
             })
-        val pendingItemTouchHelper = ItemTouchHelper(sh)
-        pendingItemTouchHelper.attachToRecyclerView(binding.subtaskRV)
+
+            val itemTouchHelper = ItemTouchHelper(it)
+            itemTouchHelper.attachToRecyclerView(binding.completedSubtaskRV)
+        }
+
         completedTaskAdapter = SubCategoryCompletedTaskAdapter(requireContext(), {
             if (categoryModel?.CategoryId != 0L) {
                 it.isImportant = !it.isImportant
@@ -114,19 +146,6 @@ class SubtaskListFragment() : Fragment() {
         })
         binding.completedSubtaskRV.setAdapterWithLinearLayout(requireContext(), completedTaskAdapter)
 //        addReorderLogicToRecyclerView()
-
-        val completedSh = SwipeHelper(requireContext(),
-            onDeleteSwipe = { viewHolder: RecyclerView.ViewHolder, _: Int ->
-                val item: SubCategoryListModel = completedTaskAdapter.data[viewHolder.adapterPosition]
-                deleteSubCategoryItemFromDB(item)
-
-                UIHelper.snackBar(binding.completedSubtaskRV, "Deleted " + item.subtaskName, "Undo") {
-                    addSubCategoryItemToDB(item)
-                    completedTaskAdapter.notifyDataSetChanged()
-                }
-            })
-        val completedITH = ItemTouchHelper(completedSh)
-        completedITH.attachToRecyclerView(binding.completedSubtaskRV)
 
         binding.addSubTaskFAB.setOnClickListener {
             setBottomSheetStateExpand()
@@ -170,7 +189,6 @@ class SubtaskListFragment() : Fragment() {
                 binding.arrowIcon.animate().rotationBy(-90f)
                     .duration = 500
                 UIHelper.collapse(binding.completedSubtaskRV, 500, 0)
-
             } else {
                 binding.arrowIcon.animate().rotationBy(90f)
                     .duration = 100
@@ -180,10 +198,8 @@ class SubtaskListFragment() : Fragment() {
 
         // priority spinner
         val arrayAdapter = ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.priority_level,
-            android.R.layout.simple_list_item_1
-        )
+            requireContext(), R.array.priority_level,
+            android.R.layout.simple_list_item_1)
         binding.bottomSheetLayout.prioritySelector.adapter = arrayAdapter
         binding.bottomSheetLayout.prioritySelector.setSelection(PRIORITY.LOW.value - 1)
     }
