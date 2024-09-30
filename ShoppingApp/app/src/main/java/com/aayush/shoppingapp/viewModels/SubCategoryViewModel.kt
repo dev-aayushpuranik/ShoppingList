@@ -31,7 +31,7 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
             if(subtaskListModel.categoryId == 0L) {
                 subtaskListModel.isImportant = true
             }
-            mRepo.addNewSubCategoryItem(context, subtaskListModel, onSuccess = {
+            mRepo.addNewSubCategoryItem(subtaskListModel, onSuccess = {
                 getSubCategoriesFromDB(requireContext = context)
             }, onError = {})
         }
@@ -39,7 +39,7 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
 
     fun updateCategoryList(context: Context, list: List<SubCategoryListModel>) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo.updateSubCategoryList(context, list, onSuccess = {
+            mRepo.updateSubCategoryList(list, onSuccess = {
                 getSubCategoriesFromDB(context)
             }, onError = {})
         }
@@ -48,7 +48,7 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
     fun updateCategoryItem(context: Context, subtaskListModel: SubCategoryListModel,
                            onSuccess:()->Unit, onFail:()->Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo.updateSubCategoryItem(context, getSubCategoryTableItem(subtaskListModel),
+            mRepo.updateSubCategoryItem(getSubCategoryTableItem(subtaskListModel),
                 onSuccess = {
                     getSubCategoriesFromDB(context)
                     onSuccess()
@@ -61,7 +61,7 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
 
     fun deleteSubCategoryItemFromDB(context: Context, model: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo.deleteSubCategoryItemFromDB(context, model, onSuccess = {
+            mRepo.deleteSubCategoryItemFromDB(model, onSuccess = {
                 getSubCategoriesFromDB(context)
             }, onError = {
                 getSubCategoriesFromDB(context)
@@ -71,7 +71,7 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
 
     fun getSubCategoriesFromDB(requireContext: Context) {
         if (mCategoryId == 0L || mCategoryId == -1L) {
-            mRepo.getAllSubCategoriesFromDB(requireContext) { it ->
+            mRepo.getAllSubCategoriesFromDB { it ->
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     arrayList.clear()
@@ -85,7 +85,7 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
             return
         }
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo.getSubCategories(requireContext, mCategoryId) {
+            mRepo.getSubCategories(mCategoryId) {
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     getSubCategories(it).forEach {

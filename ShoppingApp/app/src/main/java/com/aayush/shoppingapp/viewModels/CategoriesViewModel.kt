@@ -36,19 +36,19 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
     lateinit var mSubCategoryRepository: SubCategoryRepository
 
     suspend fun addNewCategory(context: Context, categoryModel: CategoryModel) {
-        repository.addNewCategory(context, categoryModel, onSuccess = {
+        repository.addNewCategory(categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
 
     suspend fun updateCategoryList(context: Context, categories: List<CategoryModel>) {
-        repository.updateCategoryList(context, categories, onSuccess = {
+        repository.updateCategoryList(categories, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
 
     suspend fun updateCategory(context: Context, categoryModel: CategoryModel) {
-        repository.updateCategoryModel(context, categoryModel, onSuccess = {
+        repository.updateCategoryModel(categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
@@ -63,19 +63,19 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
     }
 
     private suspend fun deleteAllSubCategoryForCategoryId(context: Context, categoryModel: CategoryModel) {
-        mSubCategoryRepository?.getSubCategories(context, categoryModel.CategoryId) {
+        mSubCategoryRepository.getSubCategories(categoryModel.CategoryId) {
             val arrayList = arrayListOf<SubCategoryListModel>()
             arrayList.addAll(getSubCategories(it))
             CoroutineScope(Dispatchers.IO).launch {
                 arrayList.forEach {
-                    mSubCategoryRepository?.deleteSubCategoryItemFromDB(context, it,{},{})
+                    mSubCategoryRepository.deleteSubCategoryItemFromDB(it,{},{})
                 }
             }
         }
     }
 
     fun getAllSubcategories(context: Context) {
-        mSubCategoryRepository?.getAllSubCategoriesFromDB(context) {
+        mSubCategoryRepository.getAllSubCategoriesFromDB {
             subCategories.clear()
             subCategories.addAll(getSubCategories(it))
         }
@@ -103,7 +103,7 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
 
     fun getCategoriesFromDB(context: Context) {
         getAllSubcategories(context)
-        repository.getCategories(context) {
+        repository.getCategories {
             CoroutineScope(Dispatchers.Main).launch {
                 val arrayList = arrayListOf<CategoryModel>()
                 arrayList.addAll(getCategories(it))

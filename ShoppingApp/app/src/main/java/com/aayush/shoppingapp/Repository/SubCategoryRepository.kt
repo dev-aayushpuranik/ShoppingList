@@ -11,35 +11,28 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class SubCategoryRepository @Inject constructor() {
+class SubCategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatabase) {
 
-    fun getSubCategories(context: Context, categoryId: Long , callback:(List<SubcategoryTable>) -> Unit) {
+    fun getSubCategories(categoryId: Long , callback:(List<SubcategoryTable>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val db by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
 
-            withContext(Dispatchers.IO) { callback(db.getAll(categoryId)?.sortedBy { it.priorityId }.orDefault()) }
+            withContext(Dispatchers.IO) { callback(shoppingDatabase.databaseDAO().getAll(categoryId)?.sortedBy { it.priorityId }.orDefault()) }
         }
     }
 
-    fun getAllSubCategoriesFromDB(context: Context, callback:(List<SubcategoryTable>) -> Unit) {
+    fun getAllSubCategoriesFromDB(callback:(List<SubcategoryTable>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val db by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
-
-            withContext(Dispatchers.IO) { callback(db.getAllSubCategories()?.sortedBy { it.priorityId }.orDefault()) }
+            withContext(Dispatchers.IO) { callback(shoppingDatabase.databaseDAO().getAllSubCategories()?.sortedBy { it.priorityId }.orDefault()) }
         }
     }
 
     suspend fun addNewSubCategoryItem(
-        context: Context,
         subCategoryListModel: SubCategoryListModel,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val db by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
-
-            db.insert(getSubCategoryTable(subCategoryListModel))
-
+            shoppingDatabase.databaseDAO().insert(getSubCategoryTable(subCategoryListModel))
             onSuccess.invoke()
         } catch (ex: Exception) {
             onError.invoke()
@@ -47,14 +40,12 @@ class SubCategoryRepository @Inject constructor() {
     }
 
     suspend fun updateSubCategoryList(
-        context: Context,
         subCategoryList: List<SubCategoryListModel>,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val db by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
-            db.insertAll(getAllSubCategories(subCategoryList))
+            shoppingDatabase.databaseDAO().insertAll(getAllSubCategories(subCategoryList))
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
@@ -62,15 +53,13 @@ class SubCategoryRepository @Inject constructor() {
     }
 
     suspend fun updateSubCategoryItem(
-        context: Context,
         subCategoryTable: SubcategoryTable?,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val subCategoryDatabase by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
             if (subCategoryTable != null) {
-                subCategoryDatabase.updateTaskDoneForSubCategory(subCategoryTable)
+                shoppingDatabase.databaseDAO().updateTaskDoneForSubCategory(subCategoryTable)
                 onSuccess.invoke()
             } else {
                 onError()
@@ -80,13 +69,12 @@ class SubCategoryRepository @Inject constructor() {
         }
     }
 
-    suspend fun deleteSubCategoryItemFromDB(context: Context,
+    suspend fun deleteSubCategoryItemFromDB(
                                          subCategoryListModel: SubCategoryListModel,
                                          onSuccess: () -> Unit,
                                          onError: () -> Unit) {
         try {
-            val subCategoryDatabase by lazy { ShoppingDatabase.getDatabase(context).databaseDAO()}
-            subCategoryDatabase.delete(getSubCategoryTable(subCategoryListModel))
+            shoppingDatabase.databaseDAO().delete(getSubCategoryTable(subCategoryListModel))
             onSuccess()
         }catch (ex:Exception) {
             onError()

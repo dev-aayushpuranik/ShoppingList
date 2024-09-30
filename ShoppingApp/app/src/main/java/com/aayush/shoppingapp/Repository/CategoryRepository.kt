@@ -4,30 +4,28 @@ import android.content.Context
 import com.aayush.shoppingapp.database.ShoppingDatabase
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
+import dagger.Provides
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
-class CategoryRepository @Inject constructor() {
+class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatabase) {
 
-    fun getCategories(context: Context, callback: (List<CategoryTable>?) -> Unit) {
+    fun getCategories(callback: (List<CategoryTable>?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val categoryDatabase by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
 
             withContext(Dispatchers.IO ) {
-                callback(categoryDatabase.getAll())
+                callback(shoppingDatabase.databaseDAO().getAll())
             }
         }
     }
 
     suspend fun addNewCategory(
-        context: Context,
         categoryModel: CategoryModel,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val categoryDatabase by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
-            categoryDatabase.insert(getCategoryTable(categoryModel))
+            shoppingDatabase.databaseDAO().insert(getCategoryTable(categoryModel))
             onSuccess.invoke()
         } catch (ex: Exception) {
             onError.invoke()
@@ -35,14 +33,12 @@ class CategoryRepository @Inject constructor() {
     }
 
     suspend fun updateCategoryList(
-        context: Context,
         categoryList: List<CategoryModel>,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val categoryDatabase by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
-            categoryDatabase.insertAll(getAllCategories(categoryList))
+            shoppingDatabase.databaseDAO().insertAll(getAllCategories(categoryList))
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
@@ -50,14 +46,12 @@ class CategoryRepository @Inject constructor() {
     }
 
     suspend fun updateCategoryModel(
-        context: Context,
         categoryModel: CategoryModel,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val categoryDatabase by lazy { ShoppingDatabase.getDatabase(context).databaseDAO() }
-            categoryDatabase.updateCategory(getCategoryTable(categoryModel))
+            shoppingDatabase.databaseDAO().updateCategory(getCategoryTable(categoryModel))
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
@@ -69,8 +63,7 @@ class CategoryRepository @Inject constructor() {
                                                 onSuccess: () -> Unit,
                                                 onError: () -> Unit) {
         try {
-            val categoryDatabase by lazy { ShoppingDatabase.getDatabase(context).databaseDAO()}
-            categoryDatabase.delete(getCategoryTable(categoryModel))
+            shoppingDatabase.databaseDAO().delete(getCategoryTable(categoryModel))
             onSuccess()
         }catch (ex:Exception) {
             onError()
