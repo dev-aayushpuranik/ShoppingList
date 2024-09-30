@@ -20,8 +20,6 @@
             android:src="@drawable/baseline_list_24"
             app:tint="@color/app_text_color"
             app:layout_constraintEnd_toStartOf="@+id/settingsMenu"
-            app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.aayush.shoppingapp.database.SQLCipherUtils
 import com.aayush.shoppingapp.database.ShoppingDatabase
+import com.aayush.shoppingapp.database.ShoppingDatabasePassphrase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,25 +17,20 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 @Module
 class DatabaseModule {
+
     @Singleton
     @Provides
-    fun provideDB(@ApplicationContext context: Context): ShoppingDatabase {
-        val userPassphrase = charArrayOf('j', 'a', 'i') // Replace with your passphrase
-        val passphrase = SQLiteDatabase.getBytes(userPassphrase)
-        val state = SQLCipherUtils.getDatabaseState(context, "ShoppingDatabase.db")
+    fun providesShoppingDatabasePassphrase(@ApplicationContext context: Context) = ShoppingDatabasePassphrase(context)
 
+    @Singleton
+    @Provides
+    fun provideSupportFactory(shoppingDatabasePassphrase: ShoppingDatabasePassphrase) = SupportFactory(shoppingDatabasePassphrase.getPassphrase())
 
-        if (state == SQLCipherUtils.State.UNENCRYPTED) {
-            SQLCipherUtils.encrypt(
-                context,
-                "ShoppingDatabase.db",
-                passphrase
-            )
-        }
-        val factory = SupportFactory(passphrase)
-
+    @Singleton
+    @Provides
+    fun provideDB(@ApplicationContext context: Context, supportFactory: SupportFactory): ShoppingDatabase {
         return Room.databaseBuilder(context, ShoppingDatabase::class.java, "ShoppingDatabase")
-            .openHelperFactory(factory)
+            .openHelperFactory(supportFactory)
             .build()
     }
 }
