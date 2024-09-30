@@ -29,11 +29,13 @@ import com.aayush.shoppingapp.viewModels.SubCategoryViewModel
 import com.aayush.shoppingapp.views.adapter.SubCategoryAdapter
 import com.aayush.shoppingapp.views.adapter.SubCategoryCompletedTaskAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 
+@AndroidEntryPoint
 class SubtaskListFragment() : Fragment() {
 
     private var categoryModel: CategoryModel? = null

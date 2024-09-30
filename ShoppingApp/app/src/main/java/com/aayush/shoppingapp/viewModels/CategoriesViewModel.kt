@@ -12,11 +12,14 @@ import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CategoriesViewModel : ViewModel() {
+@HiltViewModel
+class CategoriesViewModel @Inject constructor() : ViewModel() {
 
     val categories: MutableLiveData<List<CategoryModel>> by lazy {
         MutableLiveData<List<CategoryModel>>()
@@ -26,30 +29,33 @@ class CategoriesViewModel : ViewModel() {
         arrayListOf()
     }
 
-    private var mRepo: CategoryRepository? = CategoryRepository.getInstance()
-    private var mSubCategoryRepository: SubCategoryRepository? = SubCategoryRepository.getInstance()
+    @Inject
+    lateinit var repository: CategoryRepository
+
+    @Inject
+    lateinit var mSubCategoryRepository: SubCategoryRepository
 
     suspend fun addNewCategory(context: Context, categoryModel: CategoryModel) {
-        mRepo?.addNewCategory(context, categoryModel, onSuccess = {
+        repository.addNewCategory(context, categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
 
     suspend fun updateCategoryList(context: Context, categories: List<CategoryModel>) {
-        mRepo?.updateCategoryList(context, categories, onSuccess = {
+        repository.updateCategoryList(context, categories, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
 
     suspend fun updateCategory(context: Context, categoryModel: CategoryModel) {
-        mRepo?.updateCategoryModel(context, categoryModel, onSuccess = {
+        repository.updateCategoryModel(context, categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {})
     }
 
     suspend fun deleteCategoryItemFromDB(context: Context, categoryModel: CategoryModel) {
         deleteAllSubCategoryForCategoryId(context, categoryModel)
-        mRepo?.deleteCategoryItemFromDB(context, categoryModel, onSuccess = {
+        repository.deleteCategoryItemFromDB(context, categoryModel, onSuccess = {
             getCategoriesFromDB(context)
         }, onError = {
             getCategoriesFromDB(context)
@@ -96,9 +102,8 @@ class CategoriesViewModel : ViewModel() {
     }
 
     fun getCategoriesFromDB(context: Context) {
-        mRepo = CategoryRepository.getInstance()
         getAllSubcategories(context)
-        mRepo?.getCategories(context) {
+        repository.getCategories(context) {
             CoroutineScope(Dispatchers.Main).launch {
                 val arrayList = arrayListOf<CategoryModel>()
                 arrayList.addAll(getCategories(it))

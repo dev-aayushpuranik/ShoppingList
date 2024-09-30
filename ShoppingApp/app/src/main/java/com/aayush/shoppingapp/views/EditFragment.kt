@@ -20,8 +20,11 @@ import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import com.aayush.shoppingapp.viewModels.CategoriesViewModel
 import com.aayush.shoppingapp.viewModels.SubCategoryViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class EditFragment(private val subCategoryListModel: SubCategoryListModel? = null) : Fragment() {
 
     private lateinit var binding: FragmentEditBinding
@@ -38,11 +41,11 @@ class EditFragment(private val subCategoryListModel: SubCategoryListModel? = nul
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentEditBinding.inflate(inflater, container, false)
-        subCategoryViewModel = ViewModelProvider(this).get(SubCategoryViewModel::class.java)
-        categoryViewModel = ViewModelProvider(this).get(CategoriesViewModel::class.java)
+        subCategoryViewModel = ViewModelProvider(this)[SubCategoryViewModel::class.java]
+        categoryViewModel = ViewModelProvider(this)[CategoriesViewModel::class.java]
 
-        val title = if(subCategoryListModel != null) { subCategoryListModel.subtaskName } else if(mCategoryModel != null) { mCategoryModel?.CategoryName } else ""
-        val descripton = if(subCategoryListModel != null) { subCategoryListModel.subtaskDescription } else if(mCategoryModel != null) { "" } else ""
+        val title = subCategoryListModel?.subtaskName ?:  mCategoryModel?.CategoryName ?: ""
+        val descripton = subCategoryListModel?.subtaskDescription ?: ""
 
         binding.toolbar.toolbarTitle.text = "Edit $title"
         binding.nameTxtVw.text = Editable.Factory.getInstance().newEditable(title)

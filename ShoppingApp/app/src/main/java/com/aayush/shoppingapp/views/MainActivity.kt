@@ -11,7 +11,9 @@ import androidx.core.content.ContextCompat
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -34,11 +36,6 @@ class MainActivity : AppCompatActivity() {
 
         registerBackPressEvent()
     }
-
-//    override fun onConfigurationChanged(newConfig: Configuration) {
-//        super.onConfigurationChanged(newConfig)
-//        recreate()
-//    }
 
     private fun setToolbar(title: String, onBackPress: (() -> Unit?)?) {
         binding.toolbar.toolbarTitle.text = title

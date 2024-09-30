@@ -7,13 +7,14 @@ import com.aayush.shoppingapp.Repository.SubCategoryRepository
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.SubCategoryListModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SubCategoryViewModel: ViewModel() {
-
-    private var mRepo: SubCategoryRepository? = SubCategoryRepository.getInstance()
+@HiltViewModel
+class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRepository): ViewModel() {
 
     val subCategories: MutableLiveData<List<SubCategoryListModel>> by lazy {
         MutableLiveData<List<SubCategoryListModel>>()
@@ -30,7 +31,7 @@ class SubCategoryViewModel: ViewModel() {
             if(subtaskListModel.categoryId == 0L) {
                 subtaskListModel.isImportant = true
             }
-            mRepo?.addNewSubCategoryItem(context, subtaskListModel, onSuccess = {
+            mRepo.addNewSubCategoryItem(context, subtaskListModel, onSuccess = {
                 getSubCategoriesFromDB(requireContext = context)
             }, onError = {})
         }
@@ -38,7 +39,7 @@ class SubCategoryViewModel: ViewModel() {
 
     fun updateCategoryList(context: Context, list: List<SubCategoryListModel>) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.updateSubCategoryList(context, list, onSuccess = {
+            mRepo.updateSubCategoryList(context, list, onSuccess = {
                 getSubCategoriesFromDB(context)
             }, onError = {})
         }
@@ -47,7 +48,7 @@ class SubCategoryViewModel: ViewModel() {
     fun updateCategoryItem(context: Context, subtaskListModel: SubCategoryListModel,
                            onSuccess:()->Unit, onFail:()->Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.updateSubCategoryItem(context, getSubCategoryTableItem(subtaskListModel),
+            mRepo.updateSubCategoryItem(context, getSubCategoryTableItem(subtaskListModel),
                 onSuccess = {
                     getSubCategoriesFromDB(context)
                     onSuccess()
@@ -60,7 +61,7 @@ class SubCategoryViewModel: ViewModel() {
 
     fun deleteSubCategoryItemFromDB(context: Context, model: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.deleteSubCategoryItemFromDB(context, model, onSuccess = {
+            mRepo.deleteSubCategoryItemFromDB(context, model, onSuccess = {
                 getSubCategoriesFromDB(context)
             }, onError = {
                 getSubCategoriesFromDB(context)
@@ -70,7 +71,7 @@ class SubCategoryViewModel: ViewModel() {
 
     fun getSubCategoriesFromDB(requireContext: Context) {
         if (mCategoryId == 0L || mCategoryId == -1L) {
-            mRepo?.getAllSubCategoriesFromDB(requireContext) { it ->
+            mRepo.getAllSubCategoriesFromDB(requireContext) { it ->
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     arrayList.clear()
@@ -84,7 +85,7 @@ class SubCategoryViewModel: ViewModel() {
             return
         }
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.getSubCategories(requireContext, mCategoryId) {
+            mRepo.getSubCategories(requireContext, mCategoryId) {
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     getSubCategories(it).forEach {

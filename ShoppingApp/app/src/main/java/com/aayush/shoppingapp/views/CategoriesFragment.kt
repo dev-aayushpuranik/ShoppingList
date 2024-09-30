@@ -31,12 +31,13 @@ import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.viewModels.CategoriesViewModel
 import com.aayush.shoppingapp.views.adapter.CategoryAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 
-
+@AndroidEntryPoint
 class CategoriesFragment : Fragment() {
 
     private lateinit var binding: FragmentCategoriesBinding
