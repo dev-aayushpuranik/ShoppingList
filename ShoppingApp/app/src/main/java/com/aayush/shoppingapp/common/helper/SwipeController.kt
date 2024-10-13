@@ -1,37 +1,44 @@
 package com.aayush.shoppingapp.common.helpers
 
+import android.content.Context
 import android.graphics.*
+import android.graphics.drawable.ColorDrawable
 import android.view.MotionEvent
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE
 import androidx.recyclerview.widget.ItemTouchHelper.Callback
 import androidx.recyclerview.widget.ItemTouchHelper.LEFT
 import androidx.recyclerview.widget.ItemTouchHelper.RIGHT
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.aayush.shoppingapp.R
 import kotlin.math.max
 import kotlin.math.min
 
+class SwipeHelper(
+    val context: Context,
+    val onDeleteSwipe: (viewHolder: ViewHolder, direction: Int) -> Unit
+) : Callback() {
 
-abstract class SwipeControllerActions {
-    open fun onLeftClicked(position: Int) {}
-    open fun onRightClicked(position: Int) {}
-}
 
-// SwipeController.java
-internal enum class ButtonsState {
-    GONE,
-    LEFT_VISIBLE,
-    RIGHT_VISIBLE
-}
+    private var mContext: Context? = null
+    private val deleteIcon = ContextCompat.getDrawable(context, R.drawable.ic_baseline_delete_24)
+    private var intrinsicWidth = deleteIcon?.intrinsicWidth
+    private var intrinsicHeight = deleteIcon?.intrinsicHeight
+    private var background = ColorDrawable()
+    private var mClearPaint: Paint? = null
+    private var backgroundColor = ContextCompat.getColor(context, R.color.swipe_background_color)
+    private val clearPaint = Paint().apply { xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR) }
 
-class SwipeController(val buttonsActions: SwipeControllerActions?) : Callback() {
-    private var swipeBack = false
-    private var buttonShowedState = ButtonsState.GONE
-    private var buttonInstance: RectF? = null
-    private var currentItemViewHolder: ViewHolder? = null
-
-    override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: ViewHolder): Int {
-        return makeMovementFlags(0, LEFT or RIGHT)
+    init {
+        mContext = context
+        background = ColorDrawable()
+        backgroundColor = ContextCompat.getColor(context, R.color.swipe_background_color)
+        mClearPaint = Paint()
+        mClearPaint?.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+        intrinsicWidth = deleteIcon?.intrinsicWidth
+        intrinsicHeight = deleteIcon?.intrinsicHeight
     }
 
     override fun onMove(
@@ -40,15 +47,6 @@ class SwipeController(val buttonsActions: SwipeControllerActions?) : Callback() 
         target: ViewHolder
     ): Boolean {
         return false
-    }
-
-    override fun onSwiped(viewHolder: ViewHolder, direction: Int) {}
-    override fun convertToAbsoluteDirection(flags: Int, layoutDirection: Int): Int {
-        if (swipeBack) {
-            swipeBack = buttonShowedState != ButtonsState.GONE
-            return 0
-        }
-        return super.convertToAbsoluteDirection(flags, layoutDirection)
     }
 
     override fun onChildDraw(
@@ -60,73 +58,20 @@ class SwipeController(val buttonsActions: SwipeControllerActions?) : Callback() 
         actionState: Int,
         isCurrentlyActive: Boolean
     ) {
-        var dX = dX
-        if (actionState == ACTION_STATE_SWIPE) {
-            if (buttonShowedState != ButtonsState.GONE) {
-                if (buttonShowedState == ButtonsState.LEFT_VISIBLE) dX =
-                    max(dX.toDouble(), buttonWidth.toDouble())
-                        .toFloat()
-                if (buttonShowedState == ButtonsState.RIGHT_VISIBLE) dX =
-                    min(dX.toDouble(), -buttonWidth.toDouble())
-                        .toFloat()
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-            } else {
-                setTouchListener(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-            }
-        }
-        if (buttonShowedState == ButtonsState.GONE) {
-            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
-        }
-        currentItemViewHolder = viewHolder
-    }
+        if(isSwipeEnabled()) {
+            val itemView = viewHolder.itemView
+            val itemHeight = itemView.bottom - itemView.top
+            val isCanceled = dX == 0f && !isCurrentlyActive
 
-    private fun setTouchListener(
-        c: Canvas,
-        recyclerView: RecyclerView,
-        viewHolder: ViewHolder,
-        dX: Float,
-        dY: Float,
-        actionState: Int,
-        isCurrentlyActive: Boolean
-    ) {
-        recyclerView.setOnTouchListener { v, event ->
-            swipeBack =
-                event.action == MotionEvent.ACTION_CANCEL || event.action == MotionEvent.ACTION_UP
-            if (swipeBack) {
-                if (dX < -buttonWidth) {
-                    buttonShowedState = ButtonsState.RIGHT_VISIBLE
-                } else {
-                    if (dX > buttonWidth) buttonShowedState = ButtonsState.LEFT_VISIBLE
-                }
-                if (buttonShowedState != ButtonsState.GONE) {
-                    setTouchDownListener(
-                        c,
-                        recyclerView,
-                        viewHolder,
-                        dX,
-                        dY,
-                        actionState,
-                        isCurrentlyActive
-                    )
-                    setItemsClickable(recyclerView, false)
-                }
-            }
-            false
-        }
-    }
-
-    private fun setTouchDownListener(
-        c: Canvas,
-        recyclerView: RecyclerView,
-        viewHolder: ViewHolder,
-        dX: Float,
-        dY: Float,
-        actionState: Int,
-        isCurrentlyActive: Boolean
-    ) {
-        recyclerView.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                setTouchUpListener(
+            if (isCanceled) {
+                clearCanvas(
+                    c,
+                    itemView.right + dX,
+                    itemView.top.toFloat(),
+                    itemView.right.toFloat(),
+                    itemView.bottom.toFloat()
+                )
+                super.onChildDraw(
                     c,
                     recyclerView,
                     viewHolder,
@@ -135,105 +80,58 @@ class SwipeController(val buttonsActions: SwipeControllerActions?) : Callback() 
                     actionState,
                     isCurrentlyActive
                 )
+                return
             }
-            false
+
+            // Draw the red delete background
+            background.color = backgroundColor
+            background.setBounds(
+                itemView.right + dX.toInt(),
+                itemView.top,
+                itemView.right,
+                itemView.bottom
+            )
+            background.draw(c)
+
+            // Calculate position of delete icon
+            val deleteIconTop = itemView.top + (itemHeight - (intrinsicHeight ?: 0)) / 2
+            val deleteIconMargin = (itemHeight - (intrinsicHeight ?: 0)) / 2
+            val deleteIconLeft = itemView.right - deleteIconMargin - (intrinsicWidth ?: 0)
+            val deleteIconRight = itemView.right - deleteIconMargin
+            val deleteIconBottom = deleteIconTop + (intrinsicHeight ?: 0)
+
+            // Draw the delete icon
+            deleteIcon?.setBounds(deleteIconLeft, deleteIconTop, deleteIconRight, deleteIconBottom)
+            deleteIcon?.draw(c)
+
+            super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive)
         }
     }
 
-    private fun setTouchUpListener(
-        c: Canvas,
+    private fun clearCanvas(c: Canvas?, left: Float, top: Float, right: Float, bottom: Float) {
+        c?.drawRect(left, top, right, bottom, clearPaint)
+    }
+
+    override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: ViewHolder,
-        dX: Float,
-        dY: Float,
-        actionState: Int,
-        isCurrentlyActive: Boolean
-    ) {
-        recyclerView.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_UP) {
-                super@SwipeController.onChildDraw(
-                    c,
-                    recyclerView,
-                    viewHolder,
-                    0f,
-                    dY,
-                    actionState,
-                    isCurrentlyActive
-                )
-                recyclerView.setOnTouchListener { v, event -> false }
-                setItemsClickable(recyclerView, true)
-                swipeBack = false
-                if (buttonsActions != null && buttonInstance != null && buttonInstance!!.contains(
-                        event.x,
-                        event.y
-                    )
-                ) {
-                    if (buttonShowedState == ButtonsState.LEFT_VISIBLE) {
-                        buttonsActions.onLeftClicked(viewHolder.getAdapterPosition())
-                    } else if (buttonShowedState == ButtonsState.RIGHT_VISIBLE) {
-                        buttonsActions.onRightClicked(viewHolder.getAdapterPosition())
-                    }
-                }
-                buttonShowedState = ButtonsState.GONE
-                currentItemViewHolder = null
-            }
-            false
-        }
+        viewHolder: ViewHolder
+    ): Int {
+        return makeMovementFlags(0, LEFT)
     }
 
-    private fun setItemsClickable(recyclerView: RecyclerView, isClickable: Boolean) {
-        for (i in 0 until recyclerView.childCount) {
-            recyclerView.getChildAt(i).isClickable = isClickable
-        }
+    override fun convertToAbsoluteDirection(flags: Int, layoutDirection: Int): Int {
+        return super.convertToAbsoluteDirection(flags, layoutDirection)
     }
 
-    private fun drawButtons(c: Canvas, viewHolder: ViewHolder) {
-        val buttonWidthWithoutPadding = buttonWidth - 20
-        val corners = 30f
-        val itemView = viewHolder.itemView
-        val p = Paint()
-        val leftButton = RectF(
-            itemView.left.toFloat(),
-            itemView.top.toFloat(),
-            itemView.left + buttonWidthWithoutPadding,
-            itemView.bottom.toFloat()
-        )
-        p.setColor(Color.BLUE)
-        c.drawRoundRect(leftButton, corners, corners, p)
-        drawText("EDIT", c, leftButton, p)
-        val rightButton = RectF(
-            itemView.right - buttonWidthWithoutPadding,
-            itemView.top.toFloat(),
-            itemView.right.toFloat(),
-            itemView.bottom.toFloat()
-        )
-        p.setColor(Color.RED)
-        c.drawRoundRect(rightButton, corners, corners, p)
-        drawText("DELETE", c, rightButton, p)
-        buttonInstance = null
-        if (buttonShowedState == ButtonsState.LEFT_VISIBLE) {
-            buttonInstance = leftButton
-        } else if (buttonShowedState == ButtonsState.RIGHT_VISIBLE) {
-            buttonInstance = rightButton
-        }
+    override fun getSwipeThreshold(viewHolder: ViewHolder): Float {
+        return 0.7f;
     }
 
-    private fun drawText(text: String, c: Canvas, button: RectF, p: Paint) {
-        val textSize = 40f
-        p.setColor(Color.WHITE)
-        p.isAntiAlias = true
-        p.textSize = textSize
-        val textWidth = p.measureText(text)
-        c.drawText(text, button.centerX() - textWidth / 2, button.centerY() + textSize / 2, p)
+    override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
+        onDeleteSwipe(viewHolder, direction)
     }
 
-    fun onDraw(c: Canvas) {
-        if (currentItemViewHolder != null) {
-            drawButtons(c, currentItemViewHolder!!)
-        }
-    }
-
-    companion object {
-        private const val buttonWidth = 200f
+    private fun isSwipeEnabled(): Boolean {
+        return true
     }
 }

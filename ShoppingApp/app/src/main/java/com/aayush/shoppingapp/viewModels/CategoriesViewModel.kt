@@ -41,12 +41,6 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
         }, onError = {})
     }
 
-    suspend fun updateCategoryList(context: Context, categories: List<CategoryModel>) {
-        repository.updateCategoryList(categories, onSuccess = {
-            getCategoriesFromDB(context)
-        }, onError = {})
-    }
-
     suspend fun updateCategory(context: Context, categoryModel: CategoryModel) {
         repository.updateCategoryModel(categoryModel, onSuccess = {
             getCategoriesFromDB(context)
