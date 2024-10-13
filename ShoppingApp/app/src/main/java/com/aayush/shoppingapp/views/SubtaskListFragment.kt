@@ -293,6 +293,7 @@ private fun setView() {
 
     private fun addSubCategoryItemToDB(subCategoryListModel: SubCategoryListModel) {
         subCategoryViewModel?.addNewSubCategoryItem(requireContext(), subCategoryListModel)
+        isImportantItemMarked = false
     }
 
     private fun deleteSubCategoryItemFromDB(item: SubCategoryListModel) {
