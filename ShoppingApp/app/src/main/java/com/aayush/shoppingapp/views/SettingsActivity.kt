@@ -1,15 +1,13 @@
 package com.aayush.shoppingapp.views
 
-import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.AppCompatDelegate.NightMode
 import androidx.core.content.ContextCompat
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.helper.ThemeManager
-import com.aayush.shoppingapp.common.helper.UIHelper
 import com.aayush.shoppingapp.databinding.ActivitySettingsBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +32,11 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.darkModeSwitch.isChecked = themeManager.isDarkThemeEnabled()
 
+        binding.aboutUs.setOnClickListener {
+            val intent = Intent(this, AboutUsActivity::class.java)
+            startActivity(intent)
+        }
+
         binding.darkModeSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             ThemeManager(this).saveTheme(isChecked)
             AppCompatDelegate.setDefaultNightMode(getUserPreferecTheme())
@@ -42,7 +45,10 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.toolbar.toolbarBackArrow.setOnClickListener {
             navigateBack()
+        }
 
+        binding.crashButton.setOnClickListener {
+            RuntimeException("Test crash senario")
         }
     }
 
