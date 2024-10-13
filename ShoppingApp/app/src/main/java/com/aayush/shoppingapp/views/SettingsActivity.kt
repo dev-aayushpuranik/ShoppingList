@@ -48,7 +48,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.crashButton.setOnClickListener {
-            RuntimeException("Test crash senario")
+            throw RuntimeException("Test Crash")
         }
     }
 

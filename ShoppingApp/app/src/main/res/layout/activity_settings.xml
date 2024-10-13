@@ -71,7 +71,7 @@
                 android:padding="5dp"
                 android:text="@string/about_us" />
 
-            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/crash_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
