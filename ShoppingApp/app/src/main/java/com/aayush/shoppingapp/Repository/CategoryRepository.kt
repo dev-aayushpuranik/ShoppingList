@@ -1,6 +1,7 @@
 package com.aayush.shoppingapp.Repository
 
 import android.content.Context
+import com.aayush.shoppingapp.UIState
 import com.aayush.shoppingapp.database.ShoppingDatabase
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
@@ -13,22 +14,20 @@ class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatab
     fun getCategories(callback: (List<CategoryTable>?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
 
-            withContext(Dispatchers.IO ) {
+            withContext(Dispatchers.IO) {
                 callback(shoppingDatabase.databaseDAO().getAll())
             }
         }
     }
 
     suspend fun addNewCategory(
-        categoryModel: CategoryModel,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
+        categoryModel: CategoryModel
+    ): UIState<Nothing?> {
         try {
             shoppingDatabase.databaseDAO().insert(getCategoryTable(categoryModel))
-            onSuccess.invoke()
+            return UIState.Success(null)
         } catch (ex: Exception) {
-            onError.invoke()
+            return UIState.Error("Unable to save data. Please try again")
         }
     }
 
@@ -58,19 +57,21 @@ class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatab
         }
     }
 
-    suspend fun deleteCategoryItemFromDB(context: Context,
-                                                categoryModel: CategoryModel,
-                                                onSuccess: () -> Unit,
-                                                onError: () -> Unit) {
+    suspend fun deleteCategoryItemFromDB(
+        context: Context,
+        categoryModel: CategoryModel,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
         try {
             shoppingDatabase.databaseDAO().delete(getCategoryTable(categoryModel))
             onSuccess()
-        }catch (ex:Exception) {
+        } catch (ex: Exception) {
             onError()
         }
     }
 
-    private fun getAllCategories(categories: List<CategoryModel>) : List<CategoryTable> {
+    private fun getAllCategories(categories: List<CategoryModel>): List<CategoryTable> {
         val list = arrayListOf<CategoryTable>()
         for (category in categories) {
             list.add(getCategoryTable(category))
@@ -78,7 +79,12 @@ class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatab
         return list.toList()
     }
 
-    private fun getCategoryTable(categoryModel: CategoryModel) : CategoryTable {
-        return CategoryTable(categoryModel.CategoryId,categoryModel.CategoryName,categoryModel.Description, categoryModel.priorityId.value)
+    private fun getCategoryTable(categoryModel: CategoryModel): CategoryTable {
+        return CategoryTable(
+            categoryModel.CategoryId,
+            categoryModel.CategoryName,
+            categoryModel.Description,
+            categoryModel.priorityId.value
+        )
     }
 }

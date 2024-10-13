@@ -8,6 +8,9 @@ class ShoppingApplication: Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        net.sqlcipher.database.SQLiteDatabase.loadLibs(this)
+
     }
 
 }

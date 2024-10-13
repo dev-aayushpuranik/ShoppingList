@@ -7,19 +7,26 @@ import androidx.lifecycle.ViewModel
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.Repository.CategoryRepository
 import com.aayush.shoppingapp.Repository.SubCategoryRepository
+import com.aayush.shoppingapp.UIState
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
+import com.aayush.shoppingapp.use_case.CategorySaveUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor() : ViewModel() {
+
+    val uiStateUpdate: MutableLiveData<UIState<String>> by lazy {
+        MutableLiveData<UIState<String>>()
+    }
 
     val categories: MutableLiveData<List<CategoryModel>> by lazy {
         MutableLiveData<List<CategoryModel>>()
@@ -35,10 +42,30 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
     @Inject
     lateinit var mSubCategoryRepository: SubCategoryRepository
 
-    suspend fun addNewCategory(context: Context, categoryModel: CategoryModel) {
-        repository.addNewCategory(categoryModel, onSuccess = {
-            getCategoriesFromDB(context)
-        }, onError = {})
+    fun addNewCategory(categoryModel: CategoryModel) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val state = CategorySaveUseCase(repository).execute(categoryModel)
+            withContext(Dispatchers.Main) {
+                when (state) {
+                    is UIState.Error -> {
+                        uiStateUpdate.value = UIState.Error("Something went wrong")
+                        uiStateUpdate.value = UIState.IdleState
+                    }
+
+                    UIState.Loading -> {
+                        uiStateUpdate.value = UIState.IdleState
+                    }
+
+                    is UIState.Success -> {
+                        uiStateUpdate.value = UIState.Success("Saved Successfully")
+                        uiStateUpdate.value = UIState.IdleState
+                    }
+                    UIState.IdleState -> {
+
+                    }
+                }
+            }
+        }
     }
 
     suspend fun updateCategory(context: Context, categoryModel: CategoryModel) {

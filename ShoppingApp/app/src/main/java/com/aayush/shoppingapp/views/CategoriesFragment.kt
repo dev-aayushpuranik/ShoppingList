@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -20,6 +21,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.UIState
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.helper.UIHelper
@@ -97,6 +99,20 @@ class CategoriesFragment : Fragment() {
         )
         binding.bottomSheetLayout.prioritySelector.adapter = arrayAdapter
         binding.bottomSheetLayout.prioritySelector.setSelection(PRIORITY.LOW.value - 1)
+
+        categoryViewModel.uiStateUpdate.observe(viewLifecycleOwner) {
+            when(categoryViewModel.uiStateUpdate.value) {
+                is UIState.Error -> {
+                    UIHelper.showAlertDialog(requireContext(), "Error", "Something went wrong while saving data",{})
+                }
+                UIState.Loading -> {}
+                is UIState.Success -> {
+                    Toast.makeText(requireContext(), "Saved Successfully", Toast.LENGTH_SHORT).show()
+                    categoryViewModel.getCategoriesFromDB(requireContext())
+                }
+                else -> {}
+            }
+        }
     }
 
     private fun navigateToSettingsPage() {
@@ -246,7 +262,7 @@ class CategoriesFragment : Fragment() {
             binding.bottomSheetLayout.categoryDescriptionTv.text.toString().trim(),
             priority
         )
-        addCategoryItemToDB(categoryModel)
+        categoryViewModel.addNewCategory(categoryModel)
     }
 
     private fun getSelectedPriorityForTask(): PRIORITY {
@@ -257,12 +273,6 @@ class CategoriesFragment : Fragment() {
     private fun updateCategoryItemToDB(categoryModel: CategoryModel) {
         CoroutineScope(Dispatchers.IO).launch {
             categoryViewModel.updateCategory(requireContext(), categoryModel)
-        }
-    }
-
-    private fun addCategoryItemToDB(categoryModel: CategoryModel) {
-        CoroutineScope(Dispatchers.IO).launch {
-            categoryViewModel.addNewCategory(requireContext(), categoryModel)
         }
     }
 
