@@ -108,7 +108,7 @@ class CategoriesFragment : Fragment() {
                 UIState.Loading -> {}
                 is UIState.Success -> {
                     Toast.makeText(requireContext(), "Saved Successfully", Toast.LENGTH_SHORT).show()
-                    categoryViewModel.getCategoriesFromDB(requireContext())
+                    categoryViewModel.getCategoriesFromDB()
                 }
                 else -> {}
             }
@@ -142,7 +142,7 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun loadData() {
-        categoryViewModel.getCategoriesFromDB(requireContext())
+        categoryViewModel.getCategoriesFromDB()
         observeData()
         isListArrangement = sharedPref.getBoolean(Preference_Name, false)
         rearrangeView(isListArrangement)
@@ -272,13 +272,13 @@ class CategoriesFragment : Fragment() {
 
     private fun updateCategoryItemToDB(categoryModel: CategoryModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            categoryViewModel.updateCategory(requireContext(), categoryModel)
+            categoryViewModel.updateCategory(categoryModel)
         }
     }
 
     private fun deleteCategoryItemFromDB(item: CategoryModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            categoryViewModel.deleteCategoryItemFromDB(requireContext(), item)
+            categoryViewModel.deleteCategoryItemFromDB(item)
         }
     }
 

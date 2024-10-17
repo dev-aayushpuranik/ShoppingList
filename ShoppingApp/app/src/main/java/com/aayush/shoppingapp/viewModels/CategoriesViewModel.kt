@@ -44,46 +44,34 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
 
     fun addNewCategory(categoryModel: CategoryModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            val state = CategorySaveUseCase(repository).execute(categoryModel)
-            withContext(Dispatchers.Main) {
-                when (state) {
-                    is UIState.Error -> {
-                        uiStateUpdate.value = UIState.Error("Something went wrong")
-                        uiStateUpdate.value = UIState.IdleState
-                    }
-
-                    UIState.Loading -> {
-                        uiStateUpdate.value = UIState.IdleState
-                    }
-
-                    is UIState.Success -> {
-                        uiStateUpdate.value = UIState.Success("Saved Successfully")
-                        uiStateUpdate.value = UIState.IdleState
-                    }
-                    UIState.IdleState -> {
-
-                    }
-                }
-            }
+            uiStateUpdate.value = UIState.IdleState
+            CategorySaveUseCase(repository).execute(categoryModel,
+                onSuccess = {
+                    getCategoriesFromDB()
+                    uiStateUpdate.value = UIState.Success("Saved Successfully")
+                }, onError = { errorMessage ->
+                    uiStateUpdate.value = UIState.Error( errorMessage ?: "Something went wrong")
+                    uiStateUpdate.value = UIState.IdleState
+                })
         }
     }
 
-    suspend fun updateCategory(context: Context, categoryModel: CategoryModel) {
+    suspend fun updateCategory(categoryModel: CategoryModel) {
         repository.updateCategoryModel(categoryModel, onSuccess = {
-            getCategoriesFromDB(context)
+            getCategoriesFromDB()
         }, onError = {})
     }
 
-    suspend fun deleteCategoryItemFromDB(context: Context, categoryModel: CategoryModel) {
-        deleteAllSubCategoryForCategoryId(context, categoryModel)
-        repository.deleteCategoryItemFromDB(context, categoryModel, onSuccess = {
-            getCategoriesFromDB(context)
+    suspend fun deleteCategoryItemFromDB(categoryModel: CategoryModel) {
+        deleteAllSubCategoryForCategoryId(categoryModel)
+        repository.deleteCategoryItemFromDB(categoryModel, onSuccess = {
+            getCategoriesFromDB()
         }, onError = {
-            getCategoriesFromDB(context)
+            getCategoriesFromDB()
         })
     }
 
-    private suspend fun deleteAllSubCategoryForCategoryId(context: Context, categoryModel: CategoryModel) {
+    private suspend fun deleteAllSubCategoryForCategoryId(categoryModel: CategoryModel) {
         mSubCategoryRepository.getSubCategories(categoryModel.CategoryId) {
             val arrayList = arrayListOf<SubCategoryListModel>()
             arrayList.addAll(getSubCategories(it))
@@ -95,7 +83,7 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    fun getAllSubcategories(context: Context) {
+    fun getAllSubcategories() {
         mSubCategoryRepository.getAllSubCategoriesFromDB {
             subCategories.clear()
             subCategories.addAll(getSubCategories(it))
@@ -104,16 +92,19 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
 
     private fun getSubCategories(tables: List<SubcategoryTable>?): List<SubCategoryListModel> {
         val arrayList = arrayListOf<SubCategoryListModel>()
-        tables?.forEach {
-            getSubCategory(it)?.let { it1 -> arrayList.add(it1) }
+        tables?.forEach { item ->
+            getSubCategory(item)?.let { it1 -> arrayList.add(it1) }
         }
         return arrayList.toList()
     }
 
-    private fun getSubCategory(table: SubcategoryTable?): SubCategoryListModel? {
+    private fun getSubCategory(table: SubcategoryTable): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
-        table?.let {
-            model = SubCategoryListModel(it.subtaskItemId, it.categoryId, it.subCategoryName, it.subCategoryDescription, it.isTaskDone, it.isImportant, getSelectedPriorityForTask(it.priorityId), it.dueDate,it.remind_at)
+        table.let {
+            model = SubCategoryListModel(it.subtaskItemId,
+                it.categoryId, it.subCategoryName,
+                it.subCategoryDescription, it.isTaskDone, it.isImportant,
+                getSelectedPriorityForTask(it.priorityId), it.dueDate,it.remind_at)
         }
         return model
     }
@@ -122,8 +113,8 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
         return if (priorityIndex == PRIORITY.HIGH.value) PRIORITY.HIGH else if (priorityIndex == PRIORITY.MEDIUM.value) PRIORITY.MEDIUM else PRIORITY.LOW
     }
 
-    fun getCategoriesFromDB(context: Context) {
-        getAllSubcategories(context)
+    fun getCategoriesFromDB() {
+        getAllSubcategories()
         repository.getCategories {
             CoroutineScope(Dispatchers.Main).launch {
                 val arrayList = arrayListOf<CategoryModel>()
@@ -131,7 +122,7 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
                 arrayList.sortBy { it.priorityId }
 
                 if((subCategories.filter { it.isImportant }).isNotEmpty()) {
-                    val importantItem = CategoryModel(0, getString(context, R.string.important), "", PRIORITY.HIGH)
+                    val importantItem = CategoryModel(0, "Important Items", "", PRIORITY.HIGH)
                     arrayList.add(0, importantItem)
                 }
 

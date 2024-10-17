@@ -1,12 +1,12 @@
 package com.aayush.shoppingapp.Repository
 
-import android.content.Context
-import com.aayush.shoppingapp.UIState
 import com.aayush.shoppingapp.database.ShoppingDatabase
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
-import dagger.Provides
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatabase) {
@@ -21,13 +21,15 @@ class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatab
     }
 
     suspend fun addNewCategory(
-        categoryModel: CategoryModel
-    ): UIState<Nothing?> {
+        categoryModel: CategoryModel,
+        onSuccess: () -> Unit,
+        onError: (String?) -> Unit
+    ) {
         try {
             shoppingDatabase.databaseDAO().insert(getCategoryTable(categoryModel))
-            return UIState.Success(null)
+            onSuccess()
         } catch (ex: Exception) {
-            return UIState.Error("Unable to save data. Please try again")
+            onError(ex.localizedMessage.toString())
         }
     }
 
@@ -58,7 +60,6 @@ class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatab
     }
 
     suspend fun deleteCategoryItemFromDB(
-        context: Context,
         categoryModel: CategoryModel,
         onSuccess: () -> Unit,
         onError: () -> Unit
