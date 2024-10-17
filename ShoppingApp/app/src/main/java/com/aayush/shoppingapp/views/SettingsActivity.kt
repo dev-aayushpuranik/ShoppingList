@@ -13,6 +13,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -32,11 +33,6 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.darkModeSwitch.isChecked = themeManager.isDarkThemeEnabled()
 
-        binding.aboutUs.setOnClickListener {
-            val intent = Intent(this, AboutUsActivity::class.java)
-            startActivity(intent)
-        }
-
         binding.darkModeSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
             ThemeManager(this).saveTheme(isChecked)
             AppCompatDelegate.setDefaultNightMode(getUserPreferecTheme())
@@ -45,10 +41,6 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.toolbar.toolbarBackArrow.setOnClickListener {
             navigateBack()
-        }
-
-        binding.crashButton.setOnClickListener {
-            throw RuntimeException("Test Crash")
         }
     }
 
