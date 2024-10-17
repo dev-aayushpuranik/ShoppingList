@@ -31,16 +31,9 @@
     <string name="important_ques_mark">Important?</string>
     <string name="add_new_item">Add New Item</string>
     <string name="priority">Priority:</string>
-    <string name="about_us_text">You can create a to-do list app that
-        allows users to manage tasks by organizing them into categories and subcategories.
-        Users can mark tasks as important, highlighting them for quick access,
-        and also mark them as done to track progress.
-         With features for categorization, prioritization, and completion,
-        this app enhances task management and helps users
-        stay organized and productive.
-    </string>
     <string name="dark_mode">DARK MODE ?</string>
-    <string name="about_us">About App</string>
+    <string name="tutorial_screen">Tutorial Screen</string>
+    <!-- TODO: Remove or change this placeholder text -->
     <string-array name="priority_level">
         <item>High</item>
         <item>Medium</item>
