@@ -3,16 +3,22 @@ package com.aayush.shoppingapp.common.helpers
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.ColorDrawable
+import android.view.MotionEvent
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.ACTION_STATE_SWIPE
 import androidx.recyclerview.widget.ItemTouchHelper.Callback
+import androidx.recyclerview.widget.ItemTouchHelper.LEFT
+import androidx.recyclerview.widget.ItemTouchHelper.RIGHT
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.aayush.shoppingapp.R
-
+import kotlin.math.max
+import kotlin.math.min
 
 class SwipeHelper(
     val context: Context,
-    val onDeleteSwipe: (viewHolder: RecyclerView.ViewHolder, direction: Int) -> Unit
+    val onDeleteSwipe: (viewHolder: ViewHolder, direction: Int) -> Unit
 ) : Callback() {
 
 
@@ -37,8 +43,8 @@ class SwipeHelper(
 
     override fun onMove(
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
-        target: RecyclerView.ViewHolder
+        viewHolder: ViewHolder,
+        target: ViewHolder
     ): Boolean {
         return false
     }
@@ -46,7 +52,7 @@ class SwipeHelper(
     override fun onChildDraw(
         c: Canvas,
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder,
+        viewHolder: ViewHolder,
         dX: Float,
         dY: Float,
         actionState: Int,
@@ -108,20 +114,20 @@ class SwipeHelper(
 
     override fun getMovementFlags(
         recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
+        viewHolder: ViewHolder
     ): Int {
-        return makeMovementFlags(0, ItemTouchHelper.LEFT)
+        return makeMovementFlags(0, LEFT)
     }
 
     override fun convertToAbsoluteDirection(flags: Int, layoutDirection: Int): Int {
         return super.convertToAbsoluteDirection(flags, layoutDirection)
     }
 
-    override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
+    override fun getSwipeThreshold(viewHolder: ViewHolder): Float {
         return 0.7f;
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+    override fun onSwiped(viewHolder: ViewHolder, direction: Int) {
         onDeleteSwipe(viewHolder, direction)
     }
 

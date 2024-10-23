@@ -7,13 +7,14 @@ import com.aayush.shoppingapp.Repository.SubCategoryRepository
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.SubCategoryListModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SubCategoryViewModel: ViewModel() {
-
-    private var mRepo: SubCategoryRepository? = SubCategoryRepository.getInstance()
+@HiltViewModel
+class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRepository): ViewModel() {
 
     val subCategories: MutableLiveData<List<SubCategoryListModel>> by lazy {
         MutableLiveData<List<SubCategoryListModel>>()
@@ -25,31 +26,23 @@ class SubCategoryViewModel: ViewModel() {
     var mCategoryId: Long = 0
     var completedTaskHeight = 0;
 
-    fun addNewSubCategoryItem(context: Context, subtaskListModel: SubCategoryListModel) {
+    fun addNewSubCategoryItem(subtaskListModel: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
             if(subtaskListModel.categoryId == 0L) {
                 subtaskListModel.isImportant = true
             }
-            mRepo?.addNewSubCategoryItem(context, subtaskListModel, onSuccess = {
-                getSubCategoriesFromDB(requireContext = context)
+            mRepo.addNewSubCategoryItem(subtaskListModel, onSuccess = {
+                getSubCategoriesFromDB()
             }, onError = {})
         }
     }
 
-    fun updateCategoryList(context: Context, list: List<SubCategoryListModel>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.updateSubCategoryList(context, list, onSuccess = {
-                getSubCategoriesFromDB(context)
-            }, onError = {})
-        }
-    }
-
-    fun updateCategoryItem(context: Context, subtaskListModel: SubCategoryListModel,
+    fun updateCategoryItem(subtaskListModel: SubCategoryListModel,
                            onSuccess:()->Unit, onFail:()->Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.updateSubCategoryItem(context, getSubCategoryTableItem(subtaskListModel),
+            mRepo.updateSubCategoryItem(getSubCategoryTableItem(subtaskListModel),
                 onSuccess = {
-                    getSubCategoriesFromDB(context)
+                    getSubCategoriesFromDB()
                     onSuccess()
                 }, onError = {
                     errorModel.value = "Something went wrong"
@@ -58,19 +51,19 @@ class SubCategoryViewModel: ViewModel() {
         }
     }
 
-    fun deleteSubCategoryItemFromDB(context: Context, model: SubCategoryListModel) {
+    fun deleteSubCategoryItemFromDB(model: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.deleteSubCategoryItemFromDB(context, model, onSuccess = {
-                getSubCategoriesFromDB(context)
+            mRepo.deleteSubCategoryItemFromDB(model, onSuccess = {
+                getSubCategoriesFromDB()
             }, onError = {
-                getSubCategoriesFromDB(context)
+                getSubCategoriesFromDB()
             })
         }
     }
 
-    fun getSubCategoriesFromDB(requireContext: Context) {
+    fun getSubCategoriesFromDB() {
         if (mCategoryId == 0L || mCategoryId == -1L) {
-            mRepo?.getAllSubCategoriesFromDB(requireContext) { it ->
+            mRepo.getAllSubCategoriesFromDB { it ->
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     arrayList.clear()
@@ -84,7 +77,7 @@ class SubCategoryViewModel: ViewModel() {
             return
         }
         CoroutineScope(Dispatchers.IO).launch {
-            mRepo?.getSubCategories(requireContext, mCategoryId) {
+            mRepo.getSubCategories(mCategoryId) {
                 CoroutineScope(Dispatchers.Main).launch {
                     val arrayList = arrayListOf<SubCategoryListModel>()
                     getSubCategories(it).forEach {

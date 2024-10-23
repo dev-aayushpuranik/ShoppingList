@@ -1,14 +1,13 @@
 package com.aayush.shoppingapp.views
 
 import android.content.Context.MODE_PRIVATE
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
@@ -20,21 +19,24 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
+import com.aayush.shoppingapp.UIState
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
-import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.common.helper.UIHelper
+import com.aayush.shoppingapp.common.helper.navigateToScreen
 import com.aayush.shoppingapp.common.helpers.SwipeHelper
 import com.aayush.shoppingapp.databinding.FragmentCategoriesBinding
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.viewModels.CategoriesViewModel
 import com.aayush.shoppingapp.views.adapter.CategoryAdapter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
 
+@AndroidEntryPoint
 class CategoriesFragment : Fragment() {
 
     private lateinit var binding: FragmentCategoriesBinding
@@ -46,7 +48,7 @@ class CategoriesFragment : Fragment() {
     private var isSaveButtonEnabled = false
     private val Preference_Name = "IsListItemArrangement"
     private val SharedPreferenceDB = "SharedPreferenceDB"
-    private var isListArrangement = false
+    private var isGridArrangement = true
     private lateinit var sharedPref: SharedPreferences
 
     override fun onCreateView(
@@ -56,6 +58,8 @@ class CategoriesFragment : Fragment() {
         binding = FragmentCategoriesBinding.inflate(inflater, container, false)
         categoryViewModel = ViewModelProvider(requireActivity())[CategoriesViewModel::class.java]
         sharedPref = requireContext().getSharedPreferences(SharedPreferenceDB, MODE_PRIVATE)
+        isGridArrangement = sharedPref.getBoolean(Preference_Name, true)
+
         setView()
         loadData()
         setAddCategoryView()
@@ -64,29 +68,19 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun setView() {
-        mAdapter = CategoryAdapter({ navigateToSubTaskList(it) },
-            {
-                if(it.CategoryId != 0L) {
-                    mEditableCategoryListModel = it
-                    mIsReorderingFlagTrue = true
-                    setBottomSheetStateExpand()
-                    binding.bottomSheetLayout.addCategoryTitle.text =
-                        "Edit Item ${mEditableCategoryListModel?.CategoryName.orDefault()}"
-                    binding.bottomSheetLayout.categoryNameTV.text =
-                        Editable.Factory.getInstance().newEditable(it.CategoryName)
-                    binding.bottomSheetLayout.categoryDescriptionTv.text =
-                        Editable.Factory.getInstance().newEditable(it.Description)
-                    binding.bottomSheetLayout.prioritySelector.setSelection(it.priorityId.value - 1)
-                }
-            })
+        mAdapter = CategoryAdapter({
+            navigateToSubTaskList(it)
+        }, {
+            navigateToEditPage(it)
+        })
         binding.categoriesRV.adapter = mAdapter
         binding.itemArrangeIcon.setOnClickListener {
-            isListArrangement = !isListArrangement
-            rearrangeView(isListArrangement)
+            isGridArrangement = !isGridArrangement
+            rearrangeView(isGridArrangement)
 
             val editor: SharedPreferences.Editor = sharedPref.edit()
-            editor.putBoolean(Preference_Name, isListArrangement)
-            editor.commit()
+            editor.putBoolean(Preference_Name, isGridArrangement)
+            editor.apply()
         }
         binding.progressbar.SetViewVisible(true)
         binding.bottomSheetLayout.isImportantLayout.visibility = View.GONE
@@ -95,7 +89,7 @@ class CategoriesFragment : Fragment() {
         }
 
         binding.settingsMenu.setOnClickListener {
-            navigateToSettingsPage();
+            navigateToSettingsPage()
         }
 
         // priority spinner
@@ -106,30 +100,55 @@ class CategoriesFragment : Fragment() {
         )
         binding.bottomSheetLayout.prioritySelector.adapter = arrayAdapter
         binding.bottomSheetLayout.prioritySelector.setSelection(PRIORITY.LOW.value - 1)
+
+        categoryViewModel.uiStateUpdate.observe(viewLifecycleOwner) {
+            when (categoryViewModel.uiStateUpdate.value) {
+                is UIState.Error -> {
+                    UIHelper.showAlertDialog(
+                        requireContext(),
+                        "Error",
+                        "Something went wrong while saving data",
+                        {})
+                }
+
+                UIState.Loading -> {}
+                is UIState.Success -> {
+                    Toast.makeText(requireContext(), "Saved Successfully", Toast.LENGTH_SHORT)
+                        .show()
+                    categoryViewModel.getCategoriesFromDB()
+                }
+
+                else -> {}
+            }
+        }
     }
 
     private fun navigateToSettingsPage() {
-        val intent = Intent(requireActivity(), SettingsActivity::class.java);
-        startActivity(intent)
+        (activity as MainActivity).navigateToSettingsPage()
     }
 
-    private fun rearrangeView(isListArrangement: Boolean) {
-        if (isListArrangement) {
-            binding.categoriesRV.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            binding.itemArrangeIcon.setImageResource(R.drawable.baseline_grid_view_24)
-        } else {
+    private fun navigateToEditPage(categoryModel: CategoryModel) {
+        navigateToScreen(R.id.container,
+            EditFragment(categoryModel), "EditFragment")
+    }
+
+    private fun rearrangeView(isGridArrangement: Boolean) {
+        if (isGridArrangement) {
             binding.categoriesRV.layoutManager = GridLayoutManager(context, 2)
             binding.itemArrangeIcon.setImageResource(R.drawable.baseline_list_24)
+        } else {
+            binding.categoriesRV.layoutManager =
+                LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            binding.itemArrangeIcon.setImageResource(R.drawable.baseline_grid_view_24)
         }
 
         mAdapter.notifyDataSetChanged()
     }
 
     private fun loadData() {
-        categoryViewModel.getCategoriesFromDB(requireContext())
+        categoryViewModel.getCategoriesFromDB()
         observeData()
-        isListArrangement = sharedPref.getBoolean(Preference_Name, false)
-        rearrangeView(isListArrangement)
+//        rearrangeView(isGridArrangement)
     }
 
     private fun observeData() {
@@ -139,8 +158,8 @@ class CategoriesFragment : Fragment() {
                 binding.noTaskView.SetViewVisible(it.isEmpty())
                 mAdapter.data = it
                 setRowSwipeForRV()
-                if((categoryViewModel.categories.value?.count() ?: 0) < 2) {
-                    rearrangeView(isListArrangement)
+                if ((categoryViewModel.categories.value?.count() ?: 0) < 2) {
+                    rearrangeView(isGridArrangement)
                 }
             }
         }
@@ -150,7 +169,8 @@ class CategoriesFragment : Fragment() {
     private fun setRowSwipeForRV() {
         val sh = SwipeHelper(requireContext()) { viewHolder: RecyclerView.ViewHolder, _: Int ->
             if (categoryViewModel.categories.value?.isNotEmpty() == true
-                && (categoryViewModel.categories.value?.get(viewHolder.adapterPosition)?.CategoryId != 0L)) {
+                && (categoryViewModel.categories.value?.get(viewHolder.adapterPosition)?.CategoryId != 0L)
+            ) {
                 UIHelper.showDeleteAlertDialog(requireContext(), {
                     deleteItemOnOkButtonClick(viewHolder.adapterPosition)
                 }, {
@@ -160,7 +180,8 @@ class CategoriesFragment : Fragment() {
                 UIHelper.showAlertDialog(
                     requireContext(),
                     getString(R.string.unable_to_delete),
-                    getString(R.string.imp_item_delete_message)) {
+                    getString(R.string.imp_item_delete_message)
+                ) {
                     mAdapter.notifyDataSetChanged()
                 }
             }
@@ -175,8 +196,8 @@ class CategoriesFragment : Fragment() {
         setBottomSheetStateCollapse()
         enableSaveButton()
 
-        binding.bottomSheetLayout.categoryNameTV.doOnTextChanged { text, start, before, count ->
-            isSaveButtonEnabled = count > 0;
+        binding.bottomSheetLayout.categoryNameTV.doOnTextChanged { _, _, _, count ->
+            isSaveButtonEnabled = count > 0
             enableSaveButton()
         }
         binding.bottomSheetLayout.subTaskNameInputLayout.SetViewVisible(false)
@@ -193,7 +214,7 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun enableSaveButton() {
-        if(isSaveButtonEnabled) {
+        if (isSaveButtonEnabled) {
             binding.bottomSheetLayout.saveTaskBtn.setTextColor(getColor(R.color.app_text_color))
             binding.bottomSheetLayout.saveTaskBtn.setOnClickListener {
                 if (binding.bottomSheetLayout.categoryNameTV.text.toString().trim().isNotEmpty()) {
@@ -211,8 +232,8 @@ class CategoriesFragment : Fragment() {
                 } else {
                     UIHelper.toast(requireContext(), getString(R.string.task_name_cannot_be_empty))
                 }
-                if((categoryViewModel.categories.value?.count() ?: 0) < 2) {
-                    rearrangeView(isListArrangement)
+                if ((categoryViewModel.categories.value?.count() ?: 0) < 2) {
+                    rearrangeView(isGridArrangement)
                 }
             }
         } else {
@@ -244,7 +265,7 @@ class CategoriesFragment : Fragment() {
             binding.bottomSheetLayout.categoryDescriptionTv.text.toString().trim(),
             priority
         )
-        addCategoryItemToDB(categoryModel)
+        categoryViewModel.addNewCategory(categoryModel)
     }
 
     private fun getSelectedPriorityForTask(): PRIORITY {
@@ -254,19 +275,13 @@ class CategoriesFragment : Fragment() {
 
     private fun updateCategoryItemToDB(categoryModel: CategoryModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            categoryViewModel.updateCategory(requireContext(), categoryModel)
-        }
-    }
-
-    private fun addCategoryItemToDB(categoryModel: CategoryModel) {
-        CoroutineScope(Dispatchers.IO).launch {
-            categoryViewModel.addNewCategory(requireContext(), categoryModel)
+            categoryViewModel.updateCategory(categoryModel)
         }
     }
 
     private fun deleteCategoryItemFromDB(item: CategoryModel) {
         CoroutineScope(Dispatchers.IO).launch {
-            categoryViewModel.deleteCategoryItemFromDB(requireContext(), item)
+            categoryViewModel.deleteCategoryItemFromDB(item)
         }
     }
 
@@ -289,13 +304,14 @@ class CategoriesFragment : Fragment() {
     private fun navigateToSubTaskList(category: CategoryModel) {
         setBottomSheetStateCollapse()
         val importantItem = categoryViewModel.subCategories.filter { it.isImportant }
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.container, SubtaskListFragment(category, importantItem))
-            .addToBackStack("SubtaskListFragmentStack")
-            .commit()
+        navigateToScreen(
+            R.id.container,
+            SubtaskListFragment(category, importantItem),
+            "SubtaskListFragmentStack"
+        )
     }
 
-    private fun getColor(color:Int) = ContextCompat.getColor(requireContext(), color)
+    private fun getColor(color: Int) = ContextCompat.getColor(requireContext(), color)
 
     private fun deleteItemOnOkButtonClick(position: Int) {
         val item = categoryViewModel.categories.value?.get(position)
