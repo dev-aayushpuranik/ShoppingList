@@ -11,9 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppLauncherStyle">
         <activity
-            android:name=".views.AboutUsActivity"
-            android:exported="false" />
-        <activity
             android:name=".views.SettingsActivity"
             android:configChanges="uiMode|screenSize|orientation"
             android:exported="false"
