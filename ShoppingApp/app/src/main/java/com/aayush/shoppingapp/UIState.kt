@@ -1,0 +1,1 @@
+package com.aayush.shoppingappsealed class UIState<out T> {    object Loading: UIState<Nothing>()    object IdleState: UIState<Nothing>()    data class Success<out T>(val data: T) : UIState<T>()    data class Error(val exception: String) : UIState<Nothing>()}

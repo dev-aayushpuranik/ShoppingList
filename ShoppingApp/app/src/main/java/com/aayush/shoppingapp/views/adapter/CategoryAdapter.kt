@@ -8,14 +8,13 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.Enums.PRIORITY
-import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.databinding.CategoryRowViewBinding
 import com.aayush.shoppingapp.models.CategoryModel
 
 class CategoryAdapter(
     private val onItemClick:(CategoryModel) -> Unit,
-    private val onLongItemClicked:(CategoryModel) -> Unit
+    private val onLongItemClicked: ((CategoryModel) -> Unit)?
 ) : RecyclerView.Adapter<CategoryViewHolder>() {
 
     var data: List<CategoryModel> = ArrayList(0)
@@ -29,7 +28,7 @@ class CategoryAdapter(
         return CategoryViewHolder(parent.context, binding, { index ->
             onItemClick(data[index])
         }, { index ->
-            onLongItemClicked(data[index])
+            onLongItemClicked?.invoke(data[index])
         })
     }
 

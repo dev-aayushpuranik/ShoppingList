@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:hint="Enter Name"
+        android:textColorHint="@color/hint_color"
         android:layout_marginHorizontal="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -32,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:hint="Enter Description"
+        android:textColorHint="@color/hint_color"
         android:layout_marginHorizontal="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -50,12 +52,13 @@
     <TextView
         android:id="@+id/importantTV"
         style="@style/BottomSheetTextStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginHorizontal="10dp"
         android:gravity="center"
         android:text="@string/important"
-        android:layout_marginHorizontal="10dp"
         app:layout_constraintBottom_toBottomOf="@+id/is_Important_iv"
+        app:layout_constraintEnd_toStartOf="@+id/textView"
         app:layout_constraintStart_toEndOf="@+id/is_Important_iv"
         app:layout_constraintTop_toTopOf="@+id/is_Important_iv" />
 
@@ -90,11 +93,13 @@
         android:layout_width="1dp"
         android:layout_height="0dp"
         android:layout_marginHorizontal="10dp"
-        android:text="|"
         android:background="@color/app_text_color"
+        android:text="|"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@+id/priorityTitle"
-        app:layout_constraintStart_toEndOf="@+id/importantTV"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.41"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/priorityTitle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

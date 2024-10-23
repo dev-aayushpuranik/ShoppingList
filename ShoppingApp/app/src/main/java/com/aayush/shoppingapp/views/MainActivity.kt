@@ -1,23 +1,32 @@
 package com.aayush.shoppingapp.views
 
-import android.content.res.Configuration
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
+import com.aayush.shoppingapp.common.helper.ThemeManager
+import com.aayush.shoppingapp.common.helper.ThemeManager.Companion.getUserPreferecTheme
+import com.aayush.shoppingapp.common.helper.navigateToScreen
 import com.aayush.shoppingapp.databinding.ActivityMainBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    lateinit var settingsLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+        AppCompatDelegate.setDefaultNightMode(getUserPreferecTheme(ThemeManager(this)))
         super.onCreate(savedInstanceState)
         setTheme(R.style.ShoppingAppTheme)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -28,19 +37,28 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = ContextCompat.getColor(this, R.color.recyclerViewBG)
         setToolbar(getString(R.string.app_name), null)
 
-        supportFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, CategoriesFragment()).commit()
+        navigateToScreen(R.id.container, CategoriesFragment())
+
+        settingsLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                // Refresh the MainActivity when returning from SettingsActivity
+                recreate() // This will reload the activity and apply new UI changes like dark mode
+            }
+        }
 
         registerBackPressEvent()
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        recreate()
+    fun navigateToSettingsPage() {
+        if(::settingsLauncher.isInitialized) {
+            val intent = Intent(this, SettingsActivity::class.java)
+            settingsLauncher.launch(intent)
+        }
     }
 
-    fun setToolbar(title: String, onBackPress: (() -> Unit?)?) {
+    private fun setToolbar(title: String, onBackPress: (() -> Unit?)?) {
         binding.toolbar.toolbarTitle.text = title
         binding.toolbar.toolbarBackArrow.SetViewVisible(onBackPress != null)
         binding.toolbar.toolbarBackArrow.setOnClickListener { onBackPress?.invoke() }
@@ -53,7 +71,9 @@ class MainActivity : AppCompatActivity() {
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             try {
-                if (supportFragmentManager.fragments.size > 0 && (supportFragmentManager.fragments[0] is SubtaskListFragment)) {
+                if (supportFragmentManager.fragments.size > 0
+                    && ((supportFragmentManager.fragments[0] is SubtaskListFragment)
+                            || (supportFragmentManager.fragments[0] is EditFragment))) {
                     supportFragmentManager.popBackStack()
                 } else {
                     showAlertDialog()
@@ -74,5 +94,4 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton(getString(R.string.no), null)
             .show()
     }
-
 }

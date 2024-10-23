@@ -2,54 +2,34 @@ package com.aayush.shoppingapp.Repository
 
 import android.content.Context
 import com.aayush.shoppingapp.common.extensions.orDefault
-import com.aayush.shoppingapp.database.SubCategoryDatabase
+import com.aayush.shoppingapp.database.ShoppingDatabase
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.SubCategoryListModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Date
+import javax.inject.Inject
 
-class SubCategoryRepository {
+class SubCategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatabase) {
 
-    companion object {
-        private var instance: SubCategoryRepository? = null
-
-        @JvmName("getInstance1")
-        fun getInstance(): SubCategoryRepository? {
-            if(instance == null) { instance = SubCategoryRepository() }
-            return instance
-        }
+    suspend fun getSubCategories(categoryId: Long , callback:(List<SubcategoryTable>) -> Unit) {
+        callback(shoppingDatabase.databaseDAO().getAll(categoryId)?.sortedBy { it.priorityId }.orDefault())
     }
 
-    fun getSubCategories(context: Context, categoryId: Long , callback:(List<SubcategoryTable>) -> Unit) {
+    fun getAllSubCategoriesFromDB(callback:(List<SubcategoryTable>) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
-
-            withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAll(categoryId)?.sortedBy { it.priorityId }.orDefault()) }
-        }
-    }
-
-    fun getAllSubCategoriesFromDB(context: Context, callback:(List<SubcategoryTable>) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
-
-            withContext(Dispatchers.IO) { callback(subCategoryDatabase.getAllSubCategories()?.sortedBy { it.priorityId }.orDefault()) }
+            withContext(Dispatchers.IO) { callback(shoppingDatabase.databaseDAO().getAllSubCategories()?.sortedBy { it.priorityId }.orDefault()) }
         }
     }
 
     suspend fun addNewSubCategoryItem(
-        context: Context,
         subCategoryListModel: SubCategoryListModel,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
-
-            subCategoryDatabase.insert(getSubCategoryTable(subCategoryListModel))
-
+            shoppingDatabase.databaseDAO().insert(getSubCategoryTable(subCategoryListModel))
             onSuccess.invoke()
         } catch (ex: Exception) {
             onError.invoke()
@@ -57,14 +37,12 @@ class SubCategoryRepository {
     }
 
     suspend fun updateSubCategoryList(
-        context: Context,
         subCategoryList: List<SubCategoryListModel>,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
-            subCategoryDatabase.insertAll(getAllSubCategories(subCategoryList))
+            shoppingDatabase.databaseDAO().insertAll(getAllSubCategories(subCategoryList))
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
@@ -72,15 +50,13 @@ class SubCategoryRepository {
     }
 
     suspend fun updateSubCategoryItem(
-        context: Context,
         subCategoryTable: SubcategoryTable?,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao() }
             if (subCategoryTable != null) {
-                subCategoryDatabase.updateTaskDoneForSubCategory(subCategoryTable)
+                shoppingDatabase.databaseDAO().updateTaskDoneForSubCategory(subCategoryTable)
                 onSuccess.invoke()
             } else {
                 onError()
@@ -90,13 +66,12 @@ class SubCategoryRepository {
         }
     }
 
-    suspend fun deleteSubCategoryItemFromDB(context: Context,
+    suspend fun deleteSubCategoryItemFromDB(
                                          subCategoryListModel: SubCategoryListModel,
                                          onSuccess: () -> Unit,
                                          onError: () -> Unit) {
         try {
-            val subCategoryDatabase by lazy { SubCategoryDatabase.getDatabase(context).SubcategoryDao()}
-            subCategoryDatabase.delete(getSubCategoryTable(subCategoryListModel))
+            shoppingDatabase.databaseDAO().delete(getSubCategoryTable(subCategoryListModel))
             onSuccess()
         }catch (ex:Exception) {
             onError()
