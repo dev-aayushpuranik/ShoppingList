@@ -22,13 +22,13 @@ interface DatabaseDAO {
     suspend fun updateCategory(categoryTable: CategoryTable)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(subcategoryTable: SubcategoryTable)
+    suspend fun insert(subcategoryTable: SubcategoryTable)
 
     @Insert
     fun insertAll(list: List<SubcategoryTable>)
 
     @Delete
-    fun delete(subcategoryTable: SubcategoryTable)
+    suspend fun delete(subcategoryTable: SubcategoryTable)
 
     @Query("SELECT * FROM SubcategoryTable where categoryId=:catId")
     fun getAll(catId: Long): List<SubcategoryTable>?

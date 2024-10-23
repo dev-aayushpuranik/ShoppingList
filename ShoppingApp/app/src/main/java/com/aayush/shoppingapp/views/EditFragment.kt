@@ -108,7 +108,7 @@ class EditFragment(private val subCategoryListModel: SubCategoryListModel? = nul
                 getSelectedPriorityForTask()
             )
             lifecycleScope.launch {
-                categoryViewModel.updateCategory(requireContext(), categoryModel)
+                categoryViewModel.updateCategory(categoryModel)
                 parentFragmentManager.popBackStack()
             }
         }
@@ -124,7 +124,7 @@ class EditFragment(private val subCategoryListModel: SubCategoryListModel? = nul
             getSelectedPriorityForTask(), subCategoryListModel.dueDate, subCategoryListModel.remindAt
         )
 
-        subCategoryViewModel.updateCategoryItem(requireContext(), subCategoryListModel, {
+        subCategoryViewModel.updateCategoryItem(subCategoryListModel, {
             parentFragmentManager.popBackStack()
         }, {
             UIHelper.showAlertDialog(requireContext(), "", "", {})

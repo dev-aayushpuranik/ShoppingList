@@ -6,12 +6,12 @@ import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatDelegate
 import com.aayush.shoppingapp.R
 import com.google.android.material.snackbar.Snackbar
 
 class UIHelper {
     companion object {
-
         fun toast(context: Context, message: String) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
         }

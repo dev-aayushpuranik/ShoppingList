@@ -26,31 +26,23 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
     var mCategoryId: Long = 0
     var completedTaskHeight = 0;
 
-    fun addNewSubCategoryItem(context: Context, subtaskListModel: SubCategoryListModel) {
+    fun addNewSubCategoryItem(subtaskListModel: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
             if(subtaskListModel.categoryId == 0L) {
                 subtaskListModel.isImportant = true
             }
             mRepo.addNewSubCategoryItem(subtaskListModel, onSuccess = {
-                getSubCategoriesFromDB(requireContext = context)
+                getSubCategoriesFromDB()
             }, onError = {})
         }
     }
 
-    fun updateCategoryList(context: Context, list: List<SubCategoryListModel>) {
-        CoroutineScope(Dispatchers.IO).launch {
-            mRepo.updateSubCategoryList(list, onSuccess = {
-                getSubCategoriesFromDB(context)
-            }, onError = {})
-        }
-    }
-
-    fun updateCategoryItem(context: Context, subtaskListModel: SubCategoryListModel,
+    fun updateCategoryItem(subtaskListModel: SubCategoryListModel,
                            onSuccess:()->Unit, onFail:()->Unit) {
         CoroutineScope(Dispatchers.IO).launch {
             mRepo.updateSubCategoryItem(getSubCategoryTableItem(subtaskListModel),
                 onSuccess = {
-                    getSubCategoriesFromDB(context)
+                    getSubCategoriesFromDB()
                     onSuccess()
                 }, onError = {
                     errorModel.value = "Something went wrong"
@@ -59,17 +51,17 @@ class SubCategoryViewModel @Inject constructor(private val mRepo: SubCategoryRep
         }
     }
 
-    fun deleteSubCategoryItemFromDB(context: Context, model: SubCategoryListModel) {
+    fun deleteSubCategoryItemFromDB(model: SubCategoryListModel) {
         CoroutineScope(Dispatchers.IO).launch {
             mRepo.deleteSubCategoryItemFromDB(model, onSuccess = {
-                getSubCategoriesFromDB(context)
+                getSubCategoriesFromDB()
             }, onError = {
-                getSubCategoriesFromDB(context)
+                getSubCategoriesFromDB()
             })
         }
     }
 
-    fun getSubCategoriesFromDB(requireContext: Context) {
+    fun getSubCategoriesFromDB() {
         if (mCategoryId == 0L || mCategoryId == -1L) {
             mRepo.getAllSubCategoriesFromDB { it ->
                 CoroutineScope(Dispatchers.Main).launch {

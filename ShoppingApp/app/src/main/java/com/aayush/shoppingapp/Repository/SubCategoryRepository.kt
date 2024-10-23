@@ -13,11 +13,8 @@ import javax.inject.Inject
 
 class SubCategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatabase) {
 
-    fun getSubCategories(categoryId: Long , callback:(List<SubcategoryTable>) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-
-            withContext(Dispatchers.IO) { callback(shoppingDatabase.databaseDAO().getAll(categoryId)?.sortedBy { it.priorityId }.orDefault()) }
-        }
+    suspend fun getSubCategories(categoryId: Long , callback:(List<SubcategoryTable>) -> Unit) {
+        callback(shoppingDatabase.databaseDAO().getAll(categoryId)?.sortedBy { it.priorityId }.orDefault())
     }
 
     fun getAllSubCategoriesFromDB(callback:(List<SubcategoryTable>) -> Unit) {

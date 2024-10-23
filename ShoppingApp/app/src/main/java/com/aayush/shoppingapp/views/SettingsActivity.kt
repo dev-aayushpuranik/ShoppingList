@@ -1,6 +1,5 @@
 package com.aayush.shoppingapp.views
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
@@ -8,12 +7,12 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.ContextCompat
 import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.common.helper.ThemeManager
+import com.aayush.shoppingapp.common.helper.ThemeManager.Companion.getUserPreferecTheme
 import com.aayush.shoppingapp.databinding.ActivitySettingsBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
@@ -21,7 +20,7 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         themeManager = ThemeManager(this)
-        AppCompatDelegate.setDefaultNightMode(getUserPreferecTheme())
+        AppCompatDelegate.setDefaultNightMode(getUserPreferecTheme(themeManager))
         super.onCreate(savedInstanceState)
         setTheme(R.style.ShoppingAppTheme)
         binding = ActivitySettingsBinding.inflate(layoutInflater)
@@ -33,9 +32,9 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.darkModeSwitch.isChecked = themeManager.isDarkThemeEnabled()
 
-        binding.darkModeSwitch.setOnCheckedChangeListener { buttonView, isChecked ->
+        binding.darkModeSwitch.setOnCheckedChangeListener { _, isChecked ->
             ThemeManager(this).saveTheme(isChecked)
-            AppCompatDelegate.setDefaultNightMode(getUserPreferecTheme())
+            AppCompatDelegate.setDefaultNightMode(getUserPreferecTheme(themeManager))
             recreate()
         }
 
@@ -58,9 +57,5 @@ class SettingsActivity : AppCompatActivity() {
             delay(500)
             super.onBackPressed()
         }
-    }
-
-    private fun getUserPreferecTheme(): Int {
-        return if (themeManager.isDarkThemeEnabled()) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
     }
 }

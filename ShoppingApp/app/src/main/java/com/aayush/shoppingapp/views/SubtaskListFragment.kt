@@ -75,7 +75,7 @@ class SubtaskListFragment() : Fragment() {
             if(it == 0L) {
                 subCategoryViewModel?.subCategories?.value = mSubcategoryImportantItems
             } else {
-                subCategoryViewModel?.getSubCategoriesFromDB(requireContext())
+                subCategoryViewModel?.getSubCategoriesFromDB()
             }
         }
     }
@@ -85,10 +85,10 @@ private fun setView() {
     pendingTaskAdapter = SubCategoryAdapter(requireContext(), {
         if (categoryModel?.CategoryId != 0L) {
             it.isImportant = !it.isImportant
-            subCategoryViewModel?.updateCategoryItem(requireContext(), it, {}, {})
+            subCategoryViewModel?.updateCategoryItem(it, {}, {})
         }
     }, {
-        subCategoryViewModel?.updateCategoryItem(requireContext(), it, {}, {})
+        subCategoryViewModel?.updateCategoryItem(it, {}, {})
     }, {
         parentFragmentManager.beginTransaction()
             .replace(R.id.container, EditFragment(it))
@@ -111,10 +111,10 @@ private fun setView() {
     completedTaskAdapter = SubCategoryCompletedTaskAdapter(requireContext(), {
         if (categoryModel?.CategoryId != 0L) {
             it.isImportant = !it.isImportant
-            subCategoryViewModel?.updateCategoryItem(requireContext(), it, {}, {})
+            subCategoryViewModel?.updateCategoryItem(it, {}, {})
         }
     }, {
-        subCategoryViewModel?.updateCategoryItem(requireContext(), it, {}, {})
+        subCategoryViewModel?.updateCategoryItem(it, {}, {})
     })
     binding.completedSubtaskRV.setAdapterWithLinearLayout(requireContext(), completedTaskAdapter)
 //        addReorderLogicToRecyclerView()
@@ -137,7 +137,7 @@ private fun setView() {
     }
 
     binding.progressbar.SetViewVisible(true)
-    subCategoryViewModel?.getSubCategoriesFromDB(requireContext())
+    subCategoryViewModel?.getSubCategoriesFromDB()
     val categoryDataObserver = Observer<List<SubCategoryListModel>> {
         CoroutineScope(Dispatchers.Main).launch {
             binding.progressbar.SetViewVisible(false)
@@ -292,12 +292,12 @@ private fun setView() {
     }
 
     private fun addSubCategoryItemToDB(subCategoryListModel: SubCategoryListModel) {
-        subCategoryViewModel?.addNewSubCategoryItem(requireContext(), subCategoryListModel)
+        subCategoryViewModel?.addNewSubCategoryItem(subCategoryListModel)
         isImportantItemMarked = false
     }
 
     private fun deleteSubCategoryItemFromDB(item: SubCategoryListModel) {
-        subCategoryViewModel?.deleteSubCategoryItemFromDB(requireContext(), item)
+        subCategoryViewModel?.deleteSubCategoryItemFromDB(item)
     }
 
     private val onBackPressedCallback = object : OnBackPressedCallback(true) {
