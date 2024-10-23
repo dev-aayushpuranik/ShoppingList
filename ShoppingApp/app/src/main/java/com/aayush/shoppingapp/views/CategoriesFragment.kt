@@ -58,7 +58,7 @@ class CategoriesFragment : Fragment() {
         binding = FragmentCategoriesBinding.inflate(inflater, container, false)
         categoryViewModel = ViewModelProvider(requireActivity())[CategoriesViewModel::class.java]
         sharedPref = requireContext().getSharedPreferences(SharedPreferenceDB, MODE_PRIVATE)
-        isGridArrangement = sharedPref.getBoolean(Preference_Name, true)
+        isGridArrangement = sharedPref.getBoolean(Preference_Name, false)
 
         setView()
         loadData()
@@ -148,7 +148,7 @@ class CategoriesFragment : Fragment() {
     private fun loadData() {
         categoryViewModel.getCategoriesFromDB()
         observeData()
-//        rearrangeView(isGridArrangement)
+        rearrangeView(isGridArrangement)
     }
 
     private fun observeData() {
