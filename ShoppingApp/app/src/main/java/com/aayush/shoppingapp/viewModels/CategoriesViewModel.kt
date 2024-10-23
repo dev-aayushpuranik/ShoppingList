@@ -1,10 +1,8 @@
 package com.aayush.shoppingapp.viewModels
 
-import android.content.Context
-import androidx.core.content.ContextCompat.getString
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.aayush.shoppingapp.R
 import com.aayush.shoppingapp.Repository.CategoryRepository
 import com.aayush.shoppingapp.Repository.SubCategoryRepository
 import com.aayush.shoppingapp.UIState
@@ -13,13 +11,17 @@ import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
-import com.aayush.shoppingapp.use_case.CategorySaveUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor() : ViewModel() {
@@ -43,15 +45,23 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
     lateinit var mSubCategoryRepository: SubCategoryRepository
 
     fun addNewCategory(categoryModel: CategoryModel) {
+        uiStateUpdate.value = UIState.IdleState
         CoroutineScope(Dispatchers.IO).launch {
-            uiStateUpdate.value = UIState.IdleState
-            CategorySaveUseCase(repository).execute(categoryModel,
+            Log.d("Adding_List", "this is print is inside coroutine scope launch in first line")
+            repository.addNewCategory(categoryModel,
                 onSuccess = {
-                    getCategoriesFromDB()
-                    uiStateUpdate.value = UIState.Success("Saved Successfully")
+                    CoroutineScope(Dispatchers.IO).launch {
+                        getCategoriesFromDB()
+                        withContext(Dispatchers.Main) {
+                            uiStateUpdate.value = UIState.Success("Saved Successfully")
+                        }
+                    }
                 }, onError = { errorMessage ->
-                    uiStateUpdate.value = UIState.Error( errorMessage ?: "Something went wrong")
-                    uiStateUpdate.value = UIState.IdleState
+                    CoroutineScope(Dispatchers.Main).launch {
+                        uiStateUpdate.value =
+                            UIState.Error(errorMessage ?: "Something went wrong")
+                        uiStateUpdate.value = UIState.IdleState
+                    }
                 })
         }
     }
@@ -77,7 +87,7 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
             arrayList.addAll(getSubCategories(it))
             CoroutineScope(Dispatchers.IO).launch {
                 arrayList.forEach {
-                    mSubCategoryRepository.deleteSubCategoryItemFromDB(it,{},{})
+                    mSubCategoryRepository.deleteSubCategoryItemFromDB(it, {}, {})
                 }
             }
         }
@@ -101,15 +111,17 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
     private fun getSubCategory(table: SubcategoryTable): SubCategoryListModel? {
         var model: SubCategoryListModel? = null
         table.let {
-            model = SubCategoryListModel(it.subtaskItemId,
+            model = SubCategoryListModel(
+                it.subtaskItemId,
                 it.categoryId, it.subCategoryName,
                 it.subCategoryDescription, it.isTaskDone, it.isImportant,
-                getSelectedPriorityForTask(it.priorityId), it.dueDate,it.remind_at)
+                getSelectedPriorityForTask(it.priorityId), it.dueDate, it.remind_at
+            )
         }
         return model
     }
 
-    private fun getSelectedPriorityForTask(priorityIndex:Int): PRIORITY {
+    private fun getSelectedPriorityForTask(priorityIndex: Int): PRIORITY {
         return if (priorityIndex == PRIORITY.HIGH.value) PRIORITY.HIGH else if (priorityIndex == PRIORITY.MEDIUM.value) PRIORITY.MEDIUM else PRIORITY.LOW
     }
 
@@ -121,7 +133,7 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
                 arrayList.addAll(getCategories(it))
                 arrayList.sortBy { it.priorityId }
 
-                if((subCategories.filter { it.isImportant }).isNotEmpty()) {
+                if ((subCategories.filter { it.isImportant }).isNotEmpty()) {
                     val importantItem = CategoryModel(0, "Important Items", "", PRIORITY.HIGH)
                     arrayList.add(0, importantItem)
                 }
@@ -140,11 +152,13 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
     private fun getCategory(table: CategoryTable?): CategoryModel? {
         var model: CategoryModel? = null
         table?.let {
-            val priority = when(it.priorityId) {
+            val priority = when (it.priorityId) {
                 PRIORITY.HIGH.value -> PRIORITY.HIGH
                 PRIORITY.MEDIUM.value -> PRIORITY.MEDIUM
                 PRIORITY.LOW.value -> PRIORITY.LOW
-                else -> { PRIORITY.LOW}
+                else -> {
+                    PRIORITY.LOW
+                }
             }
             model = CategoryModel(
                 it.id,

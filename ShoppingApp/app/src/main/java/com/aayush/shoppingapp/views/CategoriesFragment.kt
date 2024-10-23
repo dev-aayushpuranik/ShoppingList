@@ -1,7 +1,6 @@
 package com.aayush.shoppingapp.views
 
 import android.content.Context.MODE_PRIVATE
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
@@ -25,6 +23,7 @@ import com.aayush.shoppingapp.UIState
 import com.aayush.shoppingapp.common.Enums.PRIORITY
 import com.aayush.shoppingapp.common.extensions.SetViewVisible
 import com.aayush.shoppingapp.common.helper.UIHelper
+import com.aayush.shoppingapp.common.helper.navigateToScreen
 import com.aayush.shoppingapp.common.helpers.SwipeHelper
 import com.aayush.shoppingapp.databinding.FragmentCategoriesBinding
 import com.aayush.shoppingapp.models.CategoryModel
@@ -101,15 +100,22 @@ class CategoriesFragment : Fragment() {
         binding.bottomSheetLayout.prioritySelector.setSelection(PRIORITY.LOW.value - 1)
 
         categoryViewModel.uiStateUpdate.observe(viewLifecycleOwner) {
-            when(categoryViewModel.uiStateUpdate.value) {
+            when (categoryViewModel.uiStateUpdate.value) {
                 is UIState.Error -> {
-                    UIHelper.showAlertDialog(requireContext(), "Error", "Something went wrong while saving data",{})
+                    UIHelper.showAlertDialog(
+                        requireContext(),
+                        "Error",
+                        "Something went wrong while saving data",
+                        {})
                 }
+
                 UIState.Loading -> {}
                 is UIState.Success -> {
-                    Toast.makeText(requireContext(), "Saved Successfully", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Saved Successfully", Toast.LENGTH_SHORT)
+                        .show()
                     categoryViewModel.getCategoriesFromDB()
                 }
+
                 else -> {}
             }
         }
@@ -120,12 +126,8 @@ class CategoriesFragment : Fragment() {
     }
 
     private fun navigateToEditPage(categoryModel: CategoryModel) {
-        parentFragmentManager
-            .beginTransaction()
-            .replace(R.id.container, EditFragment(categoryModel))
-            .addToBackStack("EditFragment")
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            .commit()
+        navigateToScreen(R.id.container,
+            EditFragment(categoryModel), "EditFragment")
     }
 
     private fun rearrangeView(isListArrangement: Boolean) {
@@ -301,11 +303,11 @@ class CategoriesFragment : Fragment() {
     private fun navigateToSubTaskList(category: CategoryModel) {
         setBottomSheetStateCollapse()
         val importantItem = categoryViewModel.subCategories.filter { it.isImportant }
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.container, SubtaskListFragment(category, importantItem))
-            .addToBackStack("SubtaskListFragmentStack")
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            .commit()
+        navigateToScreen(
+            R.id.container,
+            SubtaskListFragment(category, importantItem),
+            "SubtaskListFragmentStack"
+        )
     }
 
     private fun getColor(color: Int) = ContextCompat.getColor(requireContext(), color)
