@@ -104,6 +104,7 @@ class CategoriesFragment : Fragment() {
         categoryViewModel.uiStateUpdate.observe(viewLifecycleOwner) {
             when (categoryViewModel.uiStateUpdate.value) {
                 is UIState.Error -> {
+                    categoryViewModel.uiStateUpdate.value = UIState.IdleState
                     UIHelper.showAlertDialog(
                         requireContext(),
                         "Error",
@@ -111,8 +112,9 @@ class CategoriesFragment : Fragment() {
                         {})
                 }
 
-                UIState.Loading -> {}
+                UIState.Loading -> {categoryViewModel.uiStateUpdate.value = UIState.IdleState}
                 is UIState.Success -> {
+                    categoryViewModel.uiStateUpdate.value = UIState.IdleState
                     Toast.makeText(requireContext(), "Saved Successfully", Toast.LENGTH_SHORT)
                         .show()
                     categoryViewModel.getCategoriesFromDB()
