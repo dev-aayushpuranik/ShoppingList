@@ -48,7 +48,7 @@ class CategoriesFragment : Fragment() {
     private var isSaveButtonEnabled = false
     private val Preference_Name = "IsListItemArrangement"
     private val SharedPreferenceDB = "SharedPreferenceDB"
-    private var isListArrangement = false
+    private var isGridArrangement = true
     private lateinit var sharedPref: SharedPreferences
 
     override fun onCreateView(
@@ -58,6 +58,8 @@ class CategoriesFragment : Fragment() {
         binding = FragmentCategoriesBinding.inflate(inflater, container, false)
         categoryViewModel = ViewModelProvider(requireActivity())[CategoriesViewModel::class.java]
         sharedPref = requireContext().getSharedPreferences(SharedPreferenceDB, MODE_PRIVATE)
+        isGridArrangement = sharedPref.getBoolean(Preference_Name, true)
+
         setView()
         loadData()
         setAddCategoryView()
@@ -73,12 +75,12 @@ class CategoriesFragment : Fragment() {
         })
         binding.categoriesRV.adapter = mAdapter
         binding.itemArrangeIcon.setOnClickListener {
-            isListArrangement = !isListArrangement
-            rearrangeView(isListArrangement)
+            isGridArrangement = !isGridArrangement
+            rearrangeView(isGridArrangement)
 
             val editor: SharedPreferences.Editor = sharedPref.edit()
-            editor.putBoolean(Preference_Name, isListArrangement)
-            editor.commit()
+            editor.putBoolean(Preference_Name, isGridArrangement)
+            editor.apply()
         }
         binding.progressbar.SetViewVisible(true)
         binding.bottomSheetLayout.isImportantLayout.visibility = View.GONE
@@ -130,14 +132,14 @@ class CategoriesFragment : Fragment() {
             EditFragment(categoryModel), "EditFragment")
     }
 
-    private fun rearrangeView(isListArrangement: Boolean) {
-        if (isListArrangement) {
+    private fun rearrangeView(isGridArrangement: Boolean) {
+        if (isGridArrangement) {
+            binding.categoriesRV.layoutManager = GridLayoutManager(context, 2)
+            binding.itemArrangeIcon.setImageResource(R.drawable.baseline_list_24)
+        } else {
             binding.categoriesRV.layoutManager =
                 LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             binding.itemArrangeIcon.setImageResource(R.drawable.baseline_grid_view_24)
-        } else {
-            binding.categoriesRV.layoutManager = GridLayoutManager(context, 2)
-            binding.itemArrangeIcon.setImageResource(R.drawable.baseline_list_24)
         }
 
         mAdapter.notifyDataSetChanged()
@@ -146,8 +148,7 @@ class CategoriesFragment : Fragment() {
     private fun loadData() {
         categoryViewModel.getCategoriesFromDB()
         observeData()
-        isListArrangement = sharedPref.getBoolean(Preference_Name, false)
-        rearrangeView(isListArrangement)
+//        rearrangeView(isGridArrangement)
     }
 
     private fun observeData() {
@@ -158,7 +159,7 @@ class CategoriesFragment : Fragment() {
                 mAdapter.data = it
                 setRowSwipeForRV()
                 if ((categoryViewModel.categories.value?.count() ?: 0) < 2) {
-                    rearrangeView(isListArrangement)
+                    rearrangeView(isGridArrangement)
                 }
             }
         }
@@ -232,7 +233,7 @@ class CategoriesFragment : Fragment() {
                     UIHelper.toast(requireContext(), getString(R.string.task_name_cannot_be_empty))
                 }
                 if ((categoryViewModel.categories.value?.count() ?: 0) < 2) {
-                    rearrangeView(isListArrangement)
+                    rearrangeView(isGridArrangement)
                 }
             }
         } else {
