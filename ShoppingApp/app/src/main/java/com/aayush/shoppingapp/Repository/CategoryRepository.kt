@@ -1,60 +1,45 @@
 package com.aayush.shoppingapp.Repository
 
-import android.content.Context
-import com.aayush.shoppingapp.database.CategoryDatabase
+import com.aayush.shoppingapp.database.ShoppingDatabase
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class CategoryRepository {
+class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatabase) {
 
-    companion object {
-        var instance: CategoryRepository? = null
-
-        @JvmName("getInstance1")
-        fun getInstance(): CategoryRepository? {
-            if(instance == null) {
-                instance = CategoryRepository()
-            }
-
-            return instance
-        }
-    }
-
-    fun getCategories(context: Context, callback: (List<CategoryTable>?) -> Unit) {
+    fun getCategories(callback: (List<CategoryTable>?) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
 
-            withContext(Dispatchers.IO ) {
-                callback(categoryDatabase.getAll())
+            withContext(Dispatchers.IO) {
+                callback(shoppingDatabase.databaseDAO().getAll())
             }
         }
     }
 
     suspend fun addNewCategory(
-        context: Context,
         categoryModel: CategoryModel,
         onSuccess: () -> Unit,
-        onError: () -> Unit
+        onError: (String?) -> Unit
     ) {
         try {
-            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
-            categoryDatabase.insert(getCategoryTable(categoryModel))
-            onSuccess.invoke()
+            shoppingDatabase.databaseDAO().insert(getCategoryTable(categoryModel))
+            onSuccess()
         } catch (ex: Exception) {
-            onError.invoke()
+            onError(ex.localizedMessage.toString())
         }
     }
 
     suspend fun updateCategoryList(
-        context: Context,
         categoryList: List<CategoryModel>,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
-            categoryDatabase.insertAll(getAllCategories(categoryList))
+            shoppingDatabase.databaseDAO().insertAll(getAllCategories(categoryList))
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
@@ -62,34 +47,32 @@ class CategoryRepository {
     }
 
     suspend fun updateCategoryModel(
-        context: Context,
         categoryModel: CategoryModel,
         onSuccess: () -> Unit,
         onError: () -> Unit
     ) {
         try {
-            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao() }
-            categoryDatabase.updateCategory(getCategoryTable(categoryModel))
+            shoppingDatabase.databaseDAO().updateCategory(getCategoryTable(categoryModel))
             onSuccess.invoke()
         } catch (ex: java.lang.Exception) {
             onError.invoke()
         }
     }
 
-    suspend fun deleteCategoryItemFromDB(context: Context,
-                                                categoryModel: CategoryModel,
-                                                onSuccess: () -> Unit,
-                                                onError: () -> Unit) {
+    suspend fun deleteCategoryItemFromDB(
+        categoryModel: CategoryModel,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
         try {
-            val categoryDatabase by lazy { CategoryDatabase.getDatabase(context).CategoryDao()}
-            categoryDatabase.delete(getCategoryTable(categoryModel))
+            shoppingDatabase.databaseDAO().delete(getCategoryTable(categoryModel))
             onSuccess()
-        }catch (ex:Exception) {
+        } catch (ex: Exception) {
             onError()
         }
     }
 
-    private fun getAllCategories(categories: List<CategoryModel>) : List<CategoryTable> {
+    private fun getAllCategories(categories: List<CategoryModel>): List<CategoryTable> {
         val list = arrayListOf<CategoryTable>()
         for (category in categories) {
             list.add(getCategoryTable(category))
@@ -97,7 +80,12 @@ class CategoryRepository {
         return list.toList()
     }
 
-    private fun getCategoryTable(categoryModel: CategoryModel) : CategoryTable {
-        return CategoryTable(categoryModel.CategoryId,categoryModel.CategoryName,categoryModel.Description, categoryModel.priorityId.value)
+    private fun getCategoryTable(categoryModel: CategoryModel): CategoryTable {
+        return CategoryTable(
+            categoryModel.CategoryId,
+            categoryModel.CategoryName,
+            categoryModel.Description,
+            categoryModel.priorityId.value
+        )
     }
 }
