@@ -34,6 +34,7 @@
     <string name="dark_mode">DARK MODE ?</string>
     <string name="tutorial_screen">Tutorial Screen</string>
     <!-- TODO: Remove or change this placeholder text -->
+    <string name="title_activity_main_compose">MainComposeActivity</string>
     <string-array name="priority_level">
         <item>High</item>
         <item>Medium</item>

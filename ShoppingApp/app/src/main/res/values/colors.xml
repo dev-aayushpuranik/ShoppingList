@@ -16,4 +16,22 @@
     <color name="impotant_color">#F8D35A</color>
     <color name="hint_color">#6F6D6D</color>
     <color name="separator_color">#EAECEA</color>
+
+<!--    &lt;!&ndash; background and surface colors &ndash;&gt;-->
+<!--    <Color name ="primary_accent">#6366F1</Color> &lt;!&ndash;  &ndash;&gt;-->
+<!--    <Color name ="background">#F8FAFC</Color> &lt;!&ndash; (main app background) &ndash;&gt;-->
+<!--    <Color name ="surface">#F8FAFC</Color> &lt;!&ndash; (cards, sheets) &ndash;&gt;-->
+<!--    <Color name ="surface_variant">#F1F5F9</Color> &lt;!&ndash; (inputs, subtle sections) &ndash;&gt;-->
+
+<!--    &lt;!&ndash; text colors &ndash;&gt;-->
+<!--    <color name="primary_text">#0F172A</color> &lt;!&ndash; strong readability &ndash;&gt;-->
+<!--    <color name="secondary_text">#64748B</color> &lt;!&ndash; muted info &ndash;&gt;-->
+<!--    <color name="disabled_text">#94A3B8</color> &lt;!&ndash; muted info &ndash;&gt;-->
+
+<!--    <color name="boarder_color">#E2E8F0</color> &lt;!&ndash; muted info &ndash;&gt;-->
+
+<!--    &lt;!&ndash; status color &ndash;&gt;-->
+<!--    <color name="success_color">#22C55E</color> &lt;!&ndash; success color &ndash;&gt;-->
+<!--    <color name="warning_color">#F59E0B</color> &lt;!&ndash; warning color &ndash;&gt;-->
+<!--    <color name="Error_color">#EF4444</color> &lt;!&ndash; warning color &ndash;&gt;-->
 </resources>

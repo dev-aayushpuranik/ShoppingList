@@ -19,14 +19,4 @@ fun <T>ArrayList<T>?.orDefault() : ArrayList<T> {
 fun Int?.orDefault(): Int{
     return this ?: 0
 }
-
 // endregion Int extension
-
-
-// region String extension
-
-fun String?.orDefault(): String{
-    return if(this != null && this.isNotEmpty()) this else ""
-}
-
-// endregion String extension

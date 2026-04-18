@@ -1,0 +1,1 @@
+package com.aayush.shoppingapp.viewsimport com.aayush.shoppingapp.common.Enums.PRIORITYdata class ToDoTaskItemState (    val taskName: String = "",    val taskDescription: String = "",    val priority: PRIORITY = PRIORITY.MEDIUM    )

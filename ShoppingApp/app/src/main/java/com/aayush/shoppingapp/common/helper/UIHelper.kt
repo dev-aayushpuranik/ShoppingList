@@ -1,80 +1,83 @@
 package com.aayush.shoppingapp.common.helper
 
-import android.animation.ValueAnimator
-import android.content.Context
-import android.view.View
-import android.view.animation.DecelerateInterpolator
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatDelegate
-import com.aayush.shoppingapp.R
-import com.google.android.material.snackbar.Snackbar
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.dp
 
-class UIHelper {
-    companion object {
-        fun toast(context: Context, message: String) {
-            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
-        }
 
-        fun snackBar(view: View, message: String, actionText: String, onAction:() -> Unit) {
-            Snackbar.make(view, message, Snackbar.LENGTH_LONG)
-                .setAction(actionText) {
-                    onAction.invoke()
-                }
-                .setDuration(3000)
-                .show()
-        }
-
-        fun expand(v: View, duration: Int, targetHeight: Int) {
-            val prevHeight = v.height
-            v.visibility = View.VISIBLE
-            val valueAnimator = ValueAnimator.ofInt(prevHeight, targetHeight)
-            valueAnimator.addUpdateListener { animation ->
-                v.layoutParams.height = animation.animatedValue as Int
-                v.requestLayout()
-            }
-            valueAnimator.interpolator = DecelerateInterpolator()
-            valueAnimator.duration = duration.toLong()
-            valueAnimator.start()
-        }
-
-        fun collapse(v: View, duration: Int, targetHeight: Int) {
-            val prevHeight = v.height
-            val valueAnimator = ValueAnimator.ofInt(prevHeight, targetHeight)
-            valueAnimator.interpolator = DecelerateInterpolator()
-            valueAnimator.addUpdateListener { animation ->
-                v.layoutParams.height = animation.animatedValue as Int
-                v.requestLayout()
-            }
-            valueAnimator.interpolator = DecelerateInterpolator()
-            valueAnimator.duration = duration.toLong()
-            valueAnimator.start()
-        }
-
-        public fun showAlertDialog(context: Context, title:String, body: String, okButtonCLicked:()->Unit) {
-            AlertDialog.Builder(context)
-                .setTitle(title)
-                .setMessage(body)
-                .setCancelable(false)
-                .setNegativeButton(context.getString(R.string.ok)) { listener, _ ->
-                    okButtonCLicked()
-                    listener.dismiss()
-                }
-                .show()
-        }
-
-        public fun showDeleteAlertDialog(context: Context, yesButtonClick:()->Unit, onNoButtonClick:()->Unit) {
-            AlertDialog.Builder(context)
-                .setTitle(context.getString(R.string.delete_category_Item_title))
-                .setMessage(context.getString(R.string.delete_category_Item_content))
-                .setCancelable(false)
-                .setPositiveButton(context.getString(R.string.yes)) { _, _ ->
-                    yesButtonClick()
-                }
-                .setNegativeButton(context.getString(R.string.no)) { _, _ ->
-                    onNoButtonClick()
-                }
-                .show()
+@Composable
+fun ShowProgressBar(isProgressBarVisible: Boolean) {
+    if (isProgressBarVisible) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .alpha(0.5f)
+                .background(MaterialTheme.colorScheme.inverseSurface, RectangleShape)
+                .clickable(
+                    false, null, Role.Image,
+                    onClick = {}
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(
+                strokeWidth = 5.dp,
+                color = MaterialTheme.colorScheme.inverseOnSurface
+            )
         }
     }
+}
+
+@Composable
+fun ShowAlertDialog(
+    showDialog: MutableState<Boolean>, // State to control visibility
+    title: String,
+    message: String,
+    confirmButtonText: String? = null,
+    onConfirm: (() -> Unit?)?,
+    dismissButtonText: String? = null,
+) : Boolean {
+    if(showDialog.value) {
+        AlertDialog(
+            dismissButton = {
+                if (dismissButtonText?.isNotEmpty() == true) {
+                    Text(dismissButtonText)
+                }
+            },
+            onDismissRequest = {
+                showDialog.value = false
+            },
+            modifier = Modifier
+                .wrapContentSize()
+                .padding(5.dp),
+            title = { Text(title) },
+            text = { Text(message) },
+            containerColor = MaterialTheme.colorScheme.surface,
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog.value = false
+                    onConfirm?.invoke()
+                }) {
+                    if (confirmButtonText?.isNotEmpty() == true) {
+                        Text(confirmButtonText)
+                    }
+                }
+            },
+        )
+    }
+    return  showDialog.value
 }

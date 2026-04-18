@@ -1,0 +1,1 @@
+package com.aayush.shoppingapp.common.Enumsenum class ScreenNames {    Category, Task}sealed class NavigationItem(val route: String) {    object Category: NavigationItem(ScreenNames.Category.name)    object Task: NavigationItem(ScreenNames.Task.name+"/{categoryId}")}

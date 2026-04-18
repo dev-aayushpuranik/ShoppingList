@@ -1,110 +1,134 @@
 package com.aayush.shoppingapp.viewModels
 
-import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.aayush.shoppingapp.NetworkState
 import com.aayush.shoppingapp.Repository.CategoryRepository
 import com.aayush.shoppingapp.Repository.SubCategoryRepository
 import com.aayush.shoppingapp.UIState
 import com.aayush.shoppingapp.common.Enums.PRIORITY
-import com.aayush.shoppingapp.database.entities.CategoryTable
+import com.aayush.shoppingapp.common.extensions.orDefaultStr
 import com.aayush.shoppingapp.database.entities.SubcategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
 import com.aayush.shoppingapp.models.SubCategoryListModel
+import com.aayush.shoppingapp.views.ToDoItemState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.supervisorScope
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 @HiltViewModel
 class CategoriesViewModel @Inject constructor() : ViewModel() {
-
-    val uiStateUpdate: MutableLiveData<UIState<String>> by lazy {
-        MutableLiveData<UIState<String>>()
-    }
-
-    val categories: MutableLiveData<List<CategoryModel>> by lazy {
-        MutableLiveData<List<CategoryModel>>()
-    }
-
-    val subCategories: ArrayList<SubCategoryListModel> by lazy {
-        arrayListOf()
-    }
-
+    private val _categoryStateFlow = MutableStateFlow<UIState<List<CategoryModel>?>>(UIState.Loading)
+    val CategoryStateFlow: StateFlow<UIState<List<CategoryModel>?>> = _categoryStateFlow.asStateFlow()
+    val toDoItemState = MutableStateFlow(ToDoItemState())
+    val isUndoPressedForDelete = MutableStateFlow(false)
     @Inject
-    lateinit var repository: CategoryRepository
-
+    lateinit var mCategoryRepository: CategoryRepository
     @Inject
     lateinit var mSubCategoryRepository: SubCategoryRepository
-
-    fun addNewCategory(categoryModel: CategoryModel) {
-        uiStateUpdate.value = UIState.IdleState
-        CoroutineScope(Dispatchers.IO).launch {
-            Log.d("Adding_List", "this is print is inside coroutine scope launch in first line")
-            repository.addNewCategory(categoryModel,
-                onSuccess = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        getCategoriesFromDB()
-                        withContext(Dispatchers.Main) {
-                            uiStateUpdate.value = UIState.Success("Saved Successfully")
-                        }
-                    }
-                }, onError = { errorMessage ->
-                    CoroutineScope(Dispatchers.Main).launch {
-                        uiStateUpdate.value =
-                            UIState.Error(errorMessage ?: "Something went wrong")
-                        uiStateUpdate.value = UIState.IdleState
-                    }
-                })
+    private var recentlyDeletedCategoryModel: CategoryModel? = null
+    suspend fun getCategoriesFromDB() {
+        _categoryStateFlow.value = UIState.Loading
+        val result: NetworkState<List<CategoryModel>?> = mCategoryRepository.getCategories()
+        return when(result) {
+            is NetworkState.Error -> setErrorMessage(result.message.orDefaultStr())
+            is NetworkState.Success -> _categoryStateFlow.value = UIState.Success(result.data)
         }
     }
 
-    suspend fun updateCategory(categoryModel: CategoryModel) {
-        repository.updateCategoryModel(categoryModel, onSuccess = {
-            getCategoriesFromDB()
-        }, onError = {})
-    }
+    fun addNewCategory() {
+        val categoryModel = CategoryModel(
+            System.currentTimeMillis(),
+            toDoItemState.value.categoryName,
+            toDoItemState.value.categoryDescription,
+            toDoItemState.value.priority
+        )
 
-    suspend fun deleteCategoryItemFromDB(categoryModel: CategoryModel) {
-        deleteAllSubCategoryForCategoryId(categoryModel)
-        repository.deleteCategoryItemFromDB(categoryModel, onSuccess = {
-            getCategoriesFromDB()
-        }, onError = {
-            getCategoriesFromDB()
-        })
-    }
-
-    private suspend fun deleteAllSubCategoryForCategoryId(categoryModel: CategoryModel) {
-        mSubCategoryRepository.getSubCategories(categoryModel.CategoryId) {
-            val arrayList = arrayListOf<SubCategoryListModel>()
-            arrayList.addAll(getSubCategories(it))
-            CoroutineScope(Dispatchers.IO).launch {
-                arrayList.forEach {
-                    mSubCategoryRepository.deleteSubCategoryItemFromDB(it, {}, {})
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _categoryStateFlow.value = UIState.Loading
+                toDoItemState.update {
+                    it.copy(
+                        categoryName = "",
+                        categoryDescription = ""
+                    )
+                }
+                val result = mCategoryRepository.addNewCategory(categoryModel)
+                withContext(Dispatchers.Main) {
+                    when (result) {
+                        is NetworkState.Error -> setErrorMessage(result.message)
+                        is NetworkState.Success -> getCategoriesFromDB()
+                    }
                 }
             }
         }
     }
 
-    fun getAllSubcategories() {
-        mSubCategoryRepository.getAllSubCategoriesFromDB {
-            subCategories.clear()
-            subCategories.addAll(getSubCategories(it))
+    fun updateCategory(categoryModel: CategoryModel) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                _categoryStateFlow.value = UIState.Loading
+                val result = mCategoryRepository.updateCategoryModel(categoryModel)
+                when (result) {
+                    is NetworkState.Error -> setErrorMessage(result.message)
+                    is NetworkState.Success -> getCategoriesFromDB()
+                }
+            }
+        }
+    }
+
+    fun undoDelete() {
+        isUndoPressedForDelete.value = true
+    }
+
+    fun deleteCategoryItemFromDB(categoryModel: CategoryModel) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                delay(1000)
+                if(!isUndoPressedForDelete.value) {
+                    deleteAllSubCategoryForCategoryId(categoryModel)
+
+                    val result = mCategoryRepository.deleteCategoryItemFromDB(categoryModel)
+                    isUndoPressedForDelete.value = false
+                    when (result) {
+                        is NetworkState.Error -> setErrorMessage(result.message)
+                        is NetworkState.Success -> getCategoriesFromDB()
+                    }
+                } else {
+                    isUndoPressedForDelete.value = false
+                    _categoryStateFlow.value = UIState.NOTHING
+                }
+            }
+        }
+    }
+
+    private suspend fun deleteAllSubCategoryForCategoryId(categoryModel: CategoryModel) {
+        val result = mSubCategoryRepository.getSubCategories(categoryModel.CategoryId)
+        when(result) {
+            is NetworkState.Error -> setErrorMessage(result.message)
+            is NetworkState.Success -> {
+                val arrayList = arrayListOf<SubCategoryListModel>()
+                arrayList.addAll(getSubCategories(result.data))
+
+                arrayList.forEach {
+                    mSubCategoryRepository.deleteSubCategoryItemFromDB(it)
+                }
+            }
         }
     }
 
     private fun getSubCategories(tables: List<SubcategoryTable>?): List<SubCategoryListModel> {
         val arrayList = arrayListOf<SubCategoryListModel>()
-        tables?.forEach { item ->
-            getSubCategory(item)?.let { it1 -> arrayList.add(it1) }
-        }
+        tables?.forEach { item -> getSubCategory(item)?.let { it1 -> arrayList.add(it1) } }
         return arrayList.toList()
     }
 
@@ -122,51 +146,12 @@ class CategoriesViewModel @Inject constructor() : ViewModel() {
     }
 
     private fun getSelectedPriorityForTask(priorityIndex: Int): PRIORITY {
-        return if (priorityIndex == PRIORITY.HIGH.value) PRIORITY.HIGH else if (priorityIndex == PRIORITY.MEDIUM.value) PRIORITY.MEDIUM else PRIORITY.LOW
+        return if (priorityIndex == PRIORITY.HIGH.value) PRIORITY.HIGH
+        else if (priorityIndex == PRIORITY.MEDIUM.value) PRIORITY.MEDIUM
+        else PRIORITY.LOW
     }
 
-    fun getCategoriesFromDB() {
-        getAllSubcategories()
-        repository.getCategories {
-            CoroutineScope(Dispatchers.Main).launch {
-                val arrayList = arrayListOf<CategoryModel>()
-                arrayList.addAll(getCategories(it))
-                arrayList.sortBy { it.priorityId }
-
-                if ((subCategories.filter { it.isImportant }).isNotEmpty()) {
-                    val importantItem = CategoryModel(0, "Important Items", "", PRIORITY.HIGH)
-                    arrayList.add(0, importantItem)
-                }
-
-                categories.value = arrayList
-            }
-        }
-    }
-
-    private fun getCategories(tables: List<CategoryTable>?): List<CategoryModel> {
-        val arrayList = arrayListOf<CategoryModel>()
-        tables?.forEach { getCategory(it)?.let { it1 -> arrayList.add(it1) } }
-        return arrayList.toList()
-    }
-
-    private fun getCategory(table: CategoryTable?): CategoryModel? {
-        var model: CategoryModel? = null
-        table?.let {
-            val priority = when (it.priorityId) {
-                PRIORITY.HIGH.value -> PRIORITY.HIGH
-                PRIORITY.MEDIUM.value -> PRIORITY.MEDIUM
-                PRIORITY.LOW.value -> PRIORITY.LOW
-                else -> {
-                    PRIORITY.LOW
-                }
-            }
-            model = CategoryModel(
-                it.id,
-                it.CategoryTitle,
-                it.CategoryDescription,
-                priority
-            )
-        }
-        return model
+    private fun setErrorMessage(message: String?) {
+        _categoryStateFlow.value = UIState.Error(message.orDefaultStr())
     }
 }

@@ -4,22 +4,16 @@
 
     <application
         android:name=".ShoppingApplication"
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppLauncherStyle">
+        android:theme="@style/ShoppingAppTheme">
         <activity
-            android:name=".views.SettingsActivity"
-            android:configChanges="uiMode|screenSize|orientation"
-            android:exported="false"
-            android:windowSoftInputMode="adjustUnspecified" />
-        <activity
-            android:name=".views.MainActivity"
-            android:configChanges="uiMode|screenSize|orientation"
+            android:name=".views.MainComposeActivity"
             android:exported="true"
-            android:windowSoftInputMode="adjustUnspecified">
+            android:label="@string/title_activity_main_compose"
+            android:theme="@style/ShoppingAppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

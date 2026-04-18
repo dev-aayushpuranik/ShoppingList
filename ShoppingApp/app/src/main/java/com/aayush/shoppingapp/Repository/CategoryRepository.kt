@@ -1,74 +1,58 @@
 package com.aayush.shoppingapp.Repository
 
+import com.aayush.shoppingapp.NetworkState
+import com.aayush.shoppingapp.common.Enums.PRIORITY
+import com.aayush.shoppingapp.common.extensions.orDefault
 import com.aayush.shoppingapp.database.ShoppingDatabase
 import com.aayush.shoppingapp.database.entities.CategoryTable
 import com.aayush.shoppingapp.models.CategoryModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatabase) {
 
-    fun getCategories(callback: (List<CategoryTable>?) -> Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-
-            withContext(Dispatchers.IO) {
-                callback(shoppingDatabase.databaseDAO().getAll())
-            }
+    suspend fun getCategories(): NetworkState<List<CategoryModel>?> {
+        return try {
+            NetworkState.Success(getAllCategoryModelList(shoppingDatabase.databaseDAO().getAll()))
+        } catch (ex: Exception) {
+            NetworkState.Error(ex.message ?: "Something Went Wrong. Please try again.")
         }
     }
 
-    suspend fun addNewCategory(
-        categoryModel: CategoryModel,
-        onSuccess: () -> Unit,
-        onError: (String?) -> Unit
-    ) {
-        try {
+    suspend fun addNewCategory(categoryModel: CategoryModel): NetworkState<List<CategoryModel>?> {
+        return try {
             shoppingDatabase.databaseDAO().insert(getCategoryTable(categoryModel))
-            onSuccess()
+            NetworkState.Success(null)
         } catch (ex: Exception) {
-            onError(ex.localizedMessage.toString())
+            return NetworkState.Error(ex.message)
         }
     }
 
     suspend fun updateCategoryList(
-        categoryList: List<CategoryModel>,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        try {
+        categoryList: List<CategoryModel>
+    ): NetworkState<List<CategoryModel>?> {
+        return try {
             shoppingDatabase.databaseDAO().insertAll(getAllCategories(categoryList))
-            onSuccess.invoke()
-        } catch (ex: java.lang.Exception) {
-            onError.invoke()
+            NetworkState.Success(null)
+        } catch (ex: Exception) {
+            NetworkState.Error(ex.message)
         }
     }
 
-    suspend fun updateCategoryModel(
-        categoryModel: CategoryModel,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
-        try {
+    suspend fun updateCategoryModel(categoryModel: CategoryModel): NetworkState<List<CategoryModel>?> {
+        return try {
             shoppingDatabase.databaseDAO().updateCategory(getCategoryTable(categoryModel))
-            onSuccess.invoke()
+            NetworkState.Success(null)
         } catch (ex: java.lang.Exception) {
-            onError.invoke()
+            NetworkState.Error(ex.message)
         }
     }
 
-    suspend fun deleteCategoryItemFromDB(
-        categoryModel: CategoryModel,
-        onSuccess: () -> Unit,
-        onError: () -> Unit
-    ) {
+    suspend fun deleteCategoryItemFromDB(categoryModel: CategoryModel): NetworkState<List<CategoryModel>?> {
         try {
             shoppingDatabase.databaseDAO().delete(getCategoryTable(categoryModel))
-            onSuccess()
+            return NetworkState.Success(null)
         } catch (ex: Exception) {
-            onError()
+            return NetworkState.Error(ex.message)
         }
     }
 
@@ -86,6 +70,21 @@ class CategoryRepository @Inject constructor(val shoppingDatabase: ShoppingDatab
             categoryModel.CategoryName,
             categoryModel.Description,
             categoryModel.priorityId.value
+        )
+    }
+
+    private fun getAllCategoryModelList(categories: List<CategoryTable>?): List<CategoryModel> {
+        val list = arrayListOf<CategoryModel>()
+        for (category in categories.orDefault()) { list.add(getCategoryModel(category)) }
+        return list.toList()
+    }
+
+    private fun getCategoryModel(ct: CategoryTable): CategoryModel {
+        return CategoryModel(
+            ct.id,
+            ct.CategoryTitle,
+            ct.CategoryDescription,
+            PRIORITY.entries.get(ct.priorityId)
         )
     }
 }

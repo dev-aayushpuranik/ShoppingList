@@ -1,0 +1,1 @@
+package com.aayush.shoppingapp.common.extensionsfun String?.orEmpty(): String {    return this ?: ""}fun String?.orDefaultStr(): String {    return this ?: "Something Went Wrong. Please try again."}

@@ -16,4 +16,22 @@
     <color name="recycler_row_view_bg">#3A3939</color>
     <color name="hint_color">#CCCCCC</color>
     <color name="separator_color">#797979</color>
+
+<!--    &lt;!&ndash; background and surface colors &ndash;&gt;-->
+<!--    <Color name ="primary_accent">#818CF8</Color> &lt;!&ndash;  &ndash;&gt;-->
+<!--    <Color name ="background">#0F172A</Color> &lt;!&ndash; (main app background) &ndash;&gt;-->
+<!--    <Color name ="surface">#1E293B</Color> &lt;!&ndash; (cards, sheets) &ndash;&gt;-->
+<!--    <Color name ="surface_variant">#334155</Color> &lt;!&ndash; (inputs, subtle sections) &ndash;&gt;-->
+
+<!--    &lt;!&ndash; text colors &ndash;&gt;-->
+<!--    <color name="primary_text">#F8FAFC</color> &lt;!&ndash; strong readability &ndash;&gt;-->
+<!--    <color name="secondary_text">#CBD5F5</color> &lt;!&ndash; muted info &ndash;&gt;-->
+<!--    <color name="disabled_text">#64748B</color> &lt;!&ndash; muted info &ndash;&gt;-->
+
+<!--    <color name="boarder_color">#334155</color> &lt;!&ndash; muted info &ndash;&gt;-->
+
+<!--    &lt;!&ndash; status color &ndash;&gt;-->
+<!--    <color name="success_color">#4ADE80</color> &lt;!&ndash; success color &ndash;&gt;-->
+<!--    <color name="warning_color">#FBBF24</color> &lt;!&ndash; warning color &ndash;&gt;-->
+<!--    <color name="Error_color">#F87171</color> &lt;!&ndash; warning color &ndash;&gt;-->
 </resources>
