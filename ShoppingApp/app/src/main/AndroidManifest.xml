@@ -14,12 +14,12 @@
             android:name=".views.SettingsActivity"
             android:configChanges="uiMode|screenSize|orientation"
             android:exported="false"
-            android:windowSoftInputMode="adjustUnspecified" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".views.MainActivity"
             android:configChanges="uiMode|screenSize|orientation"
             android:exported="true"
-            android:windowSoftInputMode="adjustUnspecified">
+            android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
